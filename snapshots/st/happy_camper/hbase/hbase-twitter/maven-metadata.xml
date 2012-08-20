@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>st.happy_camper.hbase</groupId>
+  <artifactId>hbase-twitter</artifactId>
+  <versioning>
+    <versions>
+      <version>0.0.1-SNAPSHOT</version>
+      <version>0.0.2-SNAPSHOT</version>
+      <version>0.1.0-SNAPSHOT</version>
+      <version>0.1.1-SNAPSHOT</version>
+      <version>0.0.3-SNAPSHOT</version>
+      <version>0.2.0-SNAPSHOT</version>
+      <version>0.5.0-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20110421133402</lastUpdated>
+  </versioning>
+</metadata>

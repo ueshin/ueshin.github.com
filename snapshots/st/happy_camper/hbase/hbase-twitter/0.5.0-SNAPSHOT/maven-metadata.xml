@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>st.happy_camper.hbase</groupId>
+  <artifactId>hbase-twitter</artifactId>
+  <version>0.5.0-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20110421.133400</timestamp>
+      <buildNumber>2</buildNumber>
+    </snapshot>
+    <lastUpdated>20110421133400</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>0.5.0-20110421.133400-2</value>
+        <updated>20110421133400</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <classifier>tests</classifier>
+        <extension>jar</extension>
+        <value>0.5.0-20110421.133400-2</value>
+        <updated>20110421133400</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>
