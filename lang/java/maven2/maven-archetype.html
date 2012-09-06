@@ -1,0 +1,1025 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" id="sixapart-standard">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="Movable Type 5.14-ja" />
+<link rel="stylesheet" href="http://happy-camper.st/styles.css" type="text/css" />
+<link rel="start" href="http://happy-camper.st/" title="Home" />
+<link rel="alternate" type="application/atom+xml" title="Recent Entries" href="http://happy-camper.st/atom.xml" />
+<script type="text/javascript" src="http://happy-camper.st/mt.js"></script>
+<!--
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="http://happy-camper.st/lang/java/maven2/maven-archetype.html">
+<dc:title>maven-archetypeのススメ</dc:title>
+<dc:description>Maven2を使って新規にプロジェクトを作るとき、毎回pom.xmlの設定やディ...</dc:description>
+<dc:creator>Takuya UESHIN</dc:creator>
+<dc:date>2008-09-28T23:24:37+09:00</dc:date>
+<license rdf:resource="http://creativecommons.org/licenses/by/3.0/" />
+</Work>
+<License rdf:about="http://creativecommons.org/licenses/by/3.0/">
+</License>
+</rdf:RDF>
+-->
+
+
+    
+    <link rel="prev bookmark" href="http://happy-camper.st/lang/java/maven2/module.html" title="モジュール" />
+    <link rel="next bookmark" href="http://happy-camper.st/lang/java/maven2/plugins.html" title="プラグイン" />
+    
+    
+    <title>maven-archetypeのススメ - Happy-Camper Street</title>
+</head>
+<body id="classic-blog" class="mt-entry-archive layout-wtt">
+    <div id="container">
+        <div id="container-inner">
+
+
+            <div id="header">
+    <div id="header-inner">
+        <div id="header-content">
+
+
+            <div id="header-name"><a href="http://happy-camper.st/" accesskey="1">Happy-Camper Street</a></div>
+            <div id="header-description">とあるフリープログラマの頭ん中。</div>
+
+        </div>
+    </div>
+</div>
+
+
+
+            <div id="content">
+                <div id="content-inner">
+
+
+                    <div id="alpha">
+                        <div id="alpha-inner">
+
+
+                            <div id="entry-13" class="entry-asset asset hentry">
+                                <div class="asset-header">
+                                    <h1 id="page-title" class="asset-name entry-title">maven-archetypeのススメ</h1>
+                                    <div class="asset-meta">
+                                        <span class="byline">
+
+                                            <span class="vcard author"><a class="fn url" href="http://happy-camper.st">Takuya UESHIN</a></span> (<abbr class="published" title="2008-09-28T23:24:37+09:00">2008年9月28日 23:24</abbr>)
+
+                                        </span>
+
+
+                                    </div>
+                                </div>
+                                <div class="asset-content entry-content">
+
+                                    <div class="asset-body">
+                                        <a href="http://maven.apache.org/">Maven2</a>を使って新規にプロジェクトを作るとき、毎回pom.xmlの設定やディレクトリの配置をするのは面倒です。<br />（Maven2を使い込めば使い込むほどpom.xmlファイルが肥大化してきます。）<br /><br />そこでmaven-archetypeというパッケージングを使って、プロジェクトの雛形を作ることができます。<br />
+                                    </div>
+
+
+                                    <div id="more" class="asset-more">
+                                        <h2><code>archetype</code>とは</h2>Maven2プロジェクトの雛形のことを<code>archetype</code>といいます。<br /><br /><pre><code>$ mvn archetype:generate</code></pre><br />とすると、デフォルトで利用できる41個の<code>archetype</code>のリストから選択してプロジェクトを生成することができます。<br /><a href="http://happy-camper.st/lang/java/maven2/getting-started.html">Maven2の使い方</a>では、コマンドライン引数で指定することによって<code>maven-archetype-webapp</code>という<code>archetype</code>を使って簡単なプロジェクトを作成しました。<br /><br />この<code>archetype</code>というプロジェクトの雛形に良く使うプラグインや依存ライブラリを設定してあるpom.xmlファイルや、他のリソースファイルなどをあらかじめ組み込んでおくことでプロジェクト開始時の初期設定の手間を軽減することができるようになります。<br /><br /><h2><code>&lt;packaging&gt;maven-archetype&lt;/packaging&gt;</code></h2>それでは、実際に<code>archetype</code>を作ってみます。<br /><code>archetype</code>プロジェクトの基本的なディレクトリ構造は以下のようになります。<br /><br /><pre>+ sample-archetype
+    + src
+        + main
+            + resources
+                + archetype-resources
+                    - pom.xml 
+                + META-INF
+                    + maven
+                        - archetype-metadata.xml
+    - pom.xml</pre><br />ここで、src/main/resources/archetype-resources以下がこの<code>archetype</code>を使って生成するプロジェクトの雛形になります。<br />src/main/resources/archetype-resources/pom.xmlファイルに毎度面倒になる設定を記述しておき、src/main/resources/archetype-resources/src/以下に基本となるソースファイルや設定ファイルなどのリソースファイルを配置しておきます。<br /><br />sample-archetype/pom.xml<br /><br /><pre><code>&lt;project&gt;
+	&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+	&lt;groupId&gt;st.happy_camper.sample&lt;/groupId&gt;
+	&lt;artifactId&gt;sample-archetype&lt;/artifactId&gt;
+	&lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+	&lt;packaging&gt;maven-archetype&lt;/packaging&gt;
+	&lt;build&gt;
+		&lt;extensions&gt;
+			&lt;extension&gt;
+				&lt;groupId&gt;org.apache.maven.archetype&lt;/groupId&gt;
+				&lt;artifactId&gt;archetype-packaging&lt;/artifactId&gt;
+			&lt;/extension&gt;
+		&lt;/extensions&gt;
+		&lt;plugins&gt;
+			&lt;plugin&gt;
+				&lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+				&lt;artifactId&gt;maven-archetype-plugin&lt;/artifactId&gt;
+				&lt;extensions&gt;true&lt;/extensions&gt;
+			&lt;/plugin&gt;
+		&lt;/plugins&gt;
+	&lt;/build&gt;
+&lt;/project&gt;</code></pre><br /><code>archetype</code>のpackage / install / deployは通常通りです。<br /><br /><pre><code>$ mvn package
+$ mvn install
+$ mvn deploy</code></pre><br />install / deployをするとローカルのarchetype-catalog.xmlファイルに登録され、<br /><br /><pre><code>$ mvn archetype:generate</code></pre><br />で表示されるarchetypeのリストに含まれるようになります。<br /><br /><h2>archetype-metadata.xml</h2>archetype-metadata.xmlファイルには、この<code>archetype</code>に含まれるファイルやプロパティなどについての情報を記述します。<br /><br />src/main/resources/META-INF/maven/archetype-metadata.xml<br /><br /><pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;archetype-descriptor name="sample-archetype"&gt;
+  &lt;fileSets&gt;
+    &lt;fileSet filtered="true" packaged="true" encode="UTF-8"&gt;
+      &lt;directory&gt;src/main/java&lt;/directory&gt;
+      &lt;includes&gt;
+        &lt;include&gt;**/*.java&lt;/include&gt;
+      &lt;/includes&gt;
+    &lt;/fileSet&gt;
+  &lt;/fileSets&gt;
+&lt;/archetype-descriptor&gt;</code></pre><br /><h3><code>&lt;fileSet&gt;</code></h3>この<code>archetype</code>に含まれるファイル情報について記述します。<br /><br /><ul><li><code>filtered</code>属性<br /><br />プロジェクトを生成する際に<a href="http://velocity.apache.org/">Velocityテンプレートエンジン</a>によりプロパティの埋め込みを行うかどうか。<br /><code>true</code>を指定するとテンプレート内に記述してある<code>\${groupId}</code>/<code>\${artifactId}</code>/<code>\${version}</code>などの文字列をプロジェクト生成時の指定値に置き換えて生成する。<br /><br />デフォルトは<code>false</code>。<br /><br /></li><li><code>packaged</code>属性<br /><br />プロジェクトを生成するときにファイルを<code>\${package}</code>で指定したパッケージに配置するかどうか。<br />Javaソースファイルなどは<code>\${package}</code>に配置しなければならないため、<code>true</code>を指定する。<br />その他のファイルも必要に応じて<code>true</code>を指定する。<br /><br />デフォルトは<code>false</code>。<br /><br /></li><li><code>encoding</code>属性<br /><br />ファイルの文字コードを指定する。<br /><br />デフォルトはUTF-8。<br /><br /></li><li><code>&lt;directory&gt;</code>タグ<br /><br />この<code>&lt;fileSet&gt;</code>タグの設定対象となるディレクトリを指定する。<br /><br /></li><li><code>&lt;includes&gt;</code>タグ<br /><br />この<code>fileSet</code>に含めるファイルを指定する。<br /><br /></li><li><code>&lt;excludes&gt;</code>タグ<br /><br />この<code>fileSet</code>から除外するファイルを指定する。<br /></li></ul><br /><code>&lt;fileSet&gt;</code>タグは並べて複数記述することができるので、ソースファイル、リソースファイルなどの特徴に合わせて設定していきます。<br /><br /><h2><code>archetype:create-from-project</code></h2>基本的な設定を施したプロジェクトがあれば、そこから<code>archetype</code>プロジェクトを生成することができます。<br /><br />そのプロジェクトのルートディレクトリで、<br /><br />$ mvn archetype:create-from-project<br /><br />とすると、target/generated-sources/archetypeに<code>archetype</code>プロジェクトができます。<br />設定などを見直してpackage / install / deployを行えば新たな<code>archetype</code>として利用できるようになります。<br /><br /><h2>archetype-catalog.xml</h2>たくさんの<code>archetype</code>を作成したら、archetype-catalog.xmlファイルを作成しておけば<code>archetype</code>のgroupId/artifactIdなどを覚えておかなくてもこのファイルを指定して登録されている<code>archetype</code>のリストから選択する形でプロジェクトを開始できるようになります。<br /><br />archetype-catalog.xml<br /><br /><pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;archetype-catalog&gt;
+  &lt;archetypes&gt;
+    &lt;archetype&gt;
+      &lt;groupId&gt;st.happy_camper.sample&lt;/groupId&gt;
+      &lt;artifactId&gt;sample-archetype&lt;/artifactId&gt;
+      &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+      &lt;repository&gt;http://maven.repository/maven2-snapshot&lt;/repository&gt;
+    &lt;/archetype&gt;
+  &lt;/archetypes&gt;
+&lt;/archetype-catalog&gt;</code></pre><br /><code>&lt;archetype&gt;</code>タグは並べて複数記述することができます。<br /><br />このファイルを例えばhttp://maven.repository/archetype-catalog.xmlに置いたとしたら、<br /><br /><pre><code>$ mvn archetype:generate -DarchetypeCatalog=http://maven.repository/archetype-catalog.xml</code></pre><br />とすれば登録されている<code>archetype</code>がリストで表示され、選択することでプロジェクトを作成できます。<br /><br />
+                                    </div>
+
+                                </div>
+                                <div class="asset-footer">
+
+    
+                                    <div class="entry-categories">
+                                        <h4>カテゴリ<span class="delimiter">:</span></h4>
+                                        <ul>
+                                            <li class="entry-category"><a href="http://happy-camper.st/lang/java/maven2/" rel="tag">Maven2</a></li>
+                                        </ul>
+                                    </div>
+    
+
+
+                                    <div class="asset-meta">
+                                      <div id="twitter-share-button">
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="vertical" data-text="maven-archetypeのススメ - Happy-Camper Street" data-lang="ja">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                    
+                    
+
+
+                        </div>
+                    </div>
+
+
+                    <div id="beta">
+    <div id="beta-inner">
+
+
+    
+    <div class="widget-twittericon widget">
+    <h3 class="widget-header">Twitter Icon</h3>
+    <div class="widget-content">
+<a href="http://twitter.com/ueshin" title="Follow me on Twitter"><img src="http://www.twittericon.com/image/twitter228.png" alt="Twitter Icon" border="0"/></a><br />by <a href="http://www.twittericon.com" title="Twitter Backgrounds">Twitter Backgrounds</a>
+    </div>
+</div><div class="widget-adsense widget">
+    <h3 class="widget-header">AdSense</h3>
+    <div class="widget-content">
+<script type="text/javascript"><!--
+google_ad_client = "pub-8863859888091241";
+/* Happy-Camper Street */
+google_ad_slot = "8636588514";
+google_ad_width = 160;
+google_ad_height = 600;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+    </div>
+</div><div class="widget-creative-commons widget">
+   <div class="widget-content">
+      <a href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />
+      このブログは<a href="http://creativecommons.org/licenses/by/3.0/">クリエイティブ・コモンズ</a>でライセンスされています。
+   </div>
+</div>
+
+<div class="widget-powered widget">
+    <div class="widget-content">
+        <a href="http://www.sixapart.jp/movabletype/"><img src="http://happy-camper.st/mt/mt-static/images/bug-pbmt-white.png" alt="Powered by Movable Type 5.14-ja" width="120" height="75" /></a>
+    </div>
+</div>
+
+
+
+    </div>
+</div>
+
+
+
+    
+<div id="gamma">
+    <div id="gamma-inner">
+    <div class="widget-adsense widget">
+    <h3 class="widget-header">Google検索</h3>
+    <div class="widget-content">
+<style type="text/css">
+@import url(http://www.google.com/cse/api/branding.css);
+</style>
+<div class="cse-branding-bottom" style="background-color:#FFFFFF;color:#000000">
+  <div class="cse-branding-form">
+    <form action="http://www.google.co.jp" id="cse-search-box">
+      <div>
+        <input type="hidden" name="cx" value="partner-pub-8863859888091241:4091907538" />
+        <input type="hidden" name="ie" value="UTF-8" />
+        <input type="text" name="q" size="18" />
+        <input type="submit" name="sa" value="検索" />
+      </div>
+    </form>
+  </div>
+  <div class="cse-branding-logo">
+    <img src="http://www.google.com/images/poweredby_transparent/poweredby_FFFFFF.gif" alt="Google" />
+  </div>
+  <div class="cse-branding-text">
+    カスタム検索
+  </div>
+</div>
+    </div>
+</div>
+<div class="widget-calendar widget">
+    <h3 class="widget-header">2012年9月</h3>
+    <div class="widget-content">
+        <table summary="リンク付きのカレンダー">
+            <tr>
+                <th abbr="日曜日">日</th>
+                <th abbr="月曜日">月</th>
+                <th abbr="火曜日">火</th>
+                <th abbr="水曜日">水</th>
+                <th abbr="木曜日">木</th>
+                <th abbr="金曜日">金</th>
+                <th abbr="土曜日">土</th>
+            </tr>
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    1
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    2
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    3
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    4
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    5
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    6
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    7
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    8
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    9
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    10
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    11
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    12
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    13
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    14
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    15
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    16
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    17
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    18
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    19
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    20
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    21
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    22
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    23
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    24
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    25
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    26
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    27
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    28
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    29
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    30
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+            </tr>
+        
+    
+        </table>
+    </div>
+</div>
+
+<div class="widget-archive widget-archive-category widget">
+    <h3 class="widget-header">カテゴリ</h3>
+    <div class="widget-content">
+    
+        
+        <ul>
+        
+        
+            <li>言語
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/">Java (1)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hbase/">HBase (8)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hbase/workshop/">勉強会 (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hadoop/">Hadoop (14)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hadoop/pig/">Pig (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/maven2/">Maven2 (10)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/maven2/plugins/">プラグイン (5)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/guice/">Guice (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/scala/">Scala (20)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/scala/play/">Play! (6)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/ruby/">Ruby (1)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/objective-c/">Objective-C (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/books/">本 (2)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/idea/">ネタ (3)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li>開発
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/idea/development/cminst/">cminst (5)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/idea/development/siphon/">Siphon (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/trial/">お試し (5)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/trial/esoteric/">奇妙な言語 (3)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/others/">その他 (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+    </div>
+</div>
+
+
+
+
+    <div class="widget-archive-monthly widget-archive widget">
+    <h3 class="widget-header">月別 <a href="http://happy-camper.st/archives.html">アーカイブ</a></h3>
+    <div class="widget-content">
+        <ul>
+        
+            <li><a href="http://happy-camper.st/2011/09/">2011年9月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2011/05/">2011年5月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2011/01/">2011年1月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/12/">2010年12月 (4)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/11/">2010年11月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/10/">2010年10月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/09/">2010年9月 (6)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/07/">2010年7月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/06/">2010年6月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/05/">2010年5月 (5)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/04/">2010年4月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2009/03/">2009年3月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2009/01/">2009年1月 (5)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (11)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (14)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/08/">2008年8月 (1)</a></li>
+        
+        </ul>
+    </div>
+</div>
+        
+    
+
+
+
+<div class="widget-syndication widget">
+    <div class="widget-content">
+        <ul>
+            <li><img src="http://happy-camper.st/mt/mt-static/images/status_icons/feed.gif" alt="購読する" width="9" height="9" /> <a href="http://happy-camper.st/atom.xml">このブログを購読</a></li>
+
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-8145422-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+    </div>
+</div>
+
+
+
+
+                </div>
+            </div>
+
+
+            <div id="footer">
+    <div id="footer-inner">
+        <div id="footer-content">
+            <div class="widget-powered widget">
+                <div class="widget-content">
+                    Powered by <a href="http://www.sixapart.jp/movabletype/">Movable Type</a>
+                </div>
+            </div>
+
+            <div class="widget-creative-commons widget">
+                <div class="widget-content">
+                    このブログは<a href="http://creativecommons.org/licenses/by/3.0/">クリエイティブ・コモンズ</a>でライセンスされています。
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+        </div>
+    </div>
+</body>
+</html>

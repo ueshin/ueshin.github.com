@@ -1,0 +1,1049 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" id="sixapart-standard">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="Movable Type 5.14-ja" />
+<link rel="stylesheet" href="http://happy-camper.st/styles.css" type="text/css" />
+<link rel="start" href="http://happy-camper.st/" title="Home" />
+<link rel="alternate" type="application/atom+xml" title="Recent Entries" href="http://happy-camper.st/atom.xml" />
+<script type="text/javascript" src="http://happy-camper.st/mt.js"></script>
+<!--
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="http://happy-camper.st/idea/development/cminst/coming-on-stream-2.html">
+<dc:title>Coming on Stream その2</dc:title>
+<dc:description>昨日の続き。NoSQL会@博多でお見せしたかったMapReduceによる集計が3...</dc:description>
+<dc:creator>Takuya UESHIN</dc:creator>
+<dc:date>2010-09-07T22:13:07+09:00</dc:date>
+<license rdf:resource="http://creativecommons.org/licenses/by/3.0/" />
+</Work>
+<License rdf:about="http://creativecommons.org/licenses/by/3.0/">
+</License>
+</rdf:RDF>
+-->
+
+
+    
+    <link rel="prev bookmark" href="http://happy-camper.st/idea/development/cminst/coming-on-stream-1.html" title="Coming on Stream その1" />
+    <link rel="next bookmark" href="http://happy-camper.st/idea/development/cminst/coming-on-stream-3.html" title="Coming on Stream その3" />
+    
+    
+    <title>Coming on Stream その2 - Happy-Camper Street</title>
+</head>
+<body id="classic-blog" class="mt-entry-archive layout-wtt">
+    <div id="container">
+        <div id="container-inner">
+
+
+            <div id="header">
+    <div id="header-inner">
+        <div id="header-content">
+
+
+            <div id="header-name"><a href="http://happy-camper.st/" accesskey="1">Happy-Camper Street</a></div>
+            <div id="header-description">とあるフリープログラマの頭ん中。</div>
+
+        </div>
+    </div>
+</div>
+
+
+
+            <div id="content">
+                <div id="content-inner">
+
+
+                    <div id="alpha">
+                        <div id="alpha-inner">
+
+
+                            <div id="entry-45" class="entry-asset asset hentry">
+                                <div class="asset-header">
+                                    <h1 id="page-title" class="asset-name entry-title">Coming on Stream その2</h1>
+                                    <div class="asset-meta">
+                                        <span class="byline">
+
+                                            <span class="vcard author"><a class="fn url" href="http://happy-camper.st">Takuya UESHIN</a></span> (<abbr class="published" title="2010-09-07T22:13:07+09:00">2010年9月 7日 22:13</abbr>)
+
+                                        </span>
+
+
+                                        <span class="separator">|</span> <a href="http://happy-camper.st/idea/development/cminst/coming-on-stream-2.html#trackbacks">トラックバック(3)</a>
+
+                                    </div>
+                                </div>
+                                <div class="asset-content entry-content">
+
+                                    <div class="asset-body">
+                                        <a href="http://happy-camper.st/development/cminst/coming-on-stream-1.html">昨日</a>の続き。<br /><br /><a href="http://happy-camper.st/others/20100724-nosql-hakata.html">NoSQL会@博多</a>でお見せしたかったMapReduceによる集計が3つほどありました。<br /><br /><ul><li>言語（<code>user:lang</code>）で集計</li><li>ソース（<code>status#source</code>）で集計</li><li>ハッシュタグ（<code>status#text</code>から抽出）で集計</li></ul><br />昨日からデータが溜まってきていることでしょうから、ぜひ集計を実行してみてください。<br /><br />今回利用するプログラムも、<br /><br /><pre><code>$ svn checkout https://happy-camper.st/svn/hadoop/tags/hbase-twitter-0.0.1 hbase-twitter</code></pre><br />で利用できます。<br /><br />また <a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1" target="_blank">http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1</a>でブラウズできます。<br /><br />
+                                    </div>
+
+
+                                    <div id="more" class="asset-more">
+                                        <h2>言語（<code>user:lang</code>）で集計</h2>まずはシンプルな方から。<br /><br />格納されているユーザーデータの内、言語（<code>user:lang</code>）で集計します。<br />Twitterでは、6つの言語を設定できますが、充分なデータが収集できていればそれぞれの言語のユーザーがどのように分布しているのかを見ることができます。<br /><br />ソースコードは <a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/LangCounter.scala" target="_blank">LangCounter.scala</a> です。<br /><br /><h3><code>Scan</code>で絞り込み</h3><code>TableMapReduceUtil#initTableMapperJob</code> (<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/LangCounter.scala#L41" target="_blank">41行目</a>) で、MapRecuceの対象となるテーブル（第1引数）と、データ範囲（第2引数の<code>Scan</code>オブジェクト）を指定します。<br /><br />これにより、MapReduceで処理対象でないカラムファミリーをスキャンしなくなり、また、同じカラムファミリーでも必要でないカラムがMapperに渡されなくなります。<br /><br /><h3><code>LangCountMapper</code></h3>Mapperには、行キー -&gt; 行データ の形で指定したカラムデータが渡されますので、これを処理します。<br /><br />今回は、<code>user:lang</code>カラムのデータをキー、<code>1L</code>を値として出力します （<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/LangCounter.scala#L30" target="_blank">30行目</a>）。<br />この辺のMapper出力〜Reducerの流れは、よく見るワードカウントのサンプルと同じです。<br /><br /><h3>CountReducer</h3>Reducerでは、渡ってきたキーに対する値を集計していきます。<br /><br />ソースコードは <a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/CountReducer.scala" target="_blank">CountReducer.scala</a> です。<br />このReducerはあとの2つの集計でも利用します。<br /><br />なお、同様の処理をする <code>org.apache.hadoop.mapreduce.lib.reduce.LongSumReducer</code> がHadoopに標準で入っていますので、普通はこちらを使うとよいと思います。<br /><br /><h3>実行</h3>それでは実行してみます。<br /><br /><pre><code>$ mvn clean package
+$ sh target/appassembler/bin/count-lang &lt;output-dir&gt;
+$ cat &lt;output-dir&gt;/part-r-00000
+de      25129
+en      2835610
+es      303250
+fr      21047
+it      11486
+ja      664244</code></pre><br />無事に集計できました！<br />日本語設定のユーザー数は、英語に続いて2位のようです！<br /><br /><h2>ソース（<code>status#source</code>）で集計</h2>次に、ソース（<code>status#source</code>）で集計します。<br />ここでいうソースというのは、ツイッタークライアントのことです。<br />よく利用されているツイッタークライアントは何か？ を調べるための集計ですね。<br /><br />今度は、各ツイートに対する属性になるので、<code>Status</code>オブジェクトのリストを取り出す必要があります。<br /><br />ソースコードは <a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/SourceCounter.scala" target="_blank">SourceCounter.scala</a> です。<br /><br /><h3><code>Scan</code>設定</h3>今回は、<code>status</code>カラムファミリーに含まれるカラムを全て取得します （<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/SourceCounter.scala#L44" target="_blank">44行目</a>）。<br /><code>status</code>カラムファミリーに対する<code>qualifier</code>が、<code>statusId</code>（の16進16桁表記）を表していましたので、<code>status</code>カラムファミリー全体がそのユーザーのツイート群になります。<br /><br /><h3>SourceCountMapper</h3>値として渡された<code>Result</code>オブジェクトから<code>Status</code>オブジェクトを復元して （<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/SourceCounter.scala#L31" target="_blank">31行目</a>）、<code>status.source</code>をキーとして出力しています （<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/SourceCounter.scala#L32" target="_blank">32行目</a>）。<br /><br /><code>Status</code>オブジェクトの復元はScalaのパターンマッチを利用しています （<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/io/StatusWritable.scala#L100" target="_blank">StatusWritable#unapply</a>）。<br /><br />Reducerは先程と同じものを利用します。<br /><br /><h3>実行</h3>それでは実行してみます。<br /><br /><pre><code>$ sh target/appassembler/bin/count-source &lt;output-dir&gt;</code></pre><br />ちゃんと集計できましたか？<br /><br /><h2>ハッシュタグ（<code>status#text</code>から抽出）で集計</h2>最後にハッシュタグの集計を行ないます。<br /><br />ソースでの集計と同じようにStatusオブジェクトを利用しますが、さらにツイート本文からハッシュタグを抽出する処理が入ってきます。<br /><br />ソースコードは <a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/SourceCounter.scala" target="_blank">SourceCounter.scala</a> です。<br /><br /><h3>TagCountMapper</h3><code>Scan</code>設定は先程と同様です （<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/TagCounter.scala#L48" target="_blank">48行目</a>）。<br /><br /><code>Status</code>オブジェクトの復元も先程と同様ですが、今度は <code>status.user.lang == "ja"</code> という条件を付けて、日本語設定したユーザーのみを集計しています （<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/TagCounter.scala#L33" target="_blank">33行目</a>）。<br /><br />ハッシュタグの抽出は、正規表現を使いました （<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/TagCounter.scala#L28" target="_blank">28行目</a>）。<br />抽出されたハッシュタグをキーとして出力しています （<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/TagCounter.scala#L35" target="_blank">35行目</a>）。<br /><br /><h3>実行</h3>それでは実行してみます。<br /><br /><pre><code>$ sh target/appassembler/bin/count-tag &lt;output-dir&gt;</code></pre><br />やってみていただけると分かりますが、見知らぬタグや奇妙なタグが出てきて楽しいです。<br /><br /><h2>おまけ</h2><h3>Scan設定について</h3>MapReduceの集計対象は、<code>Scan</code>の設定によって変わります。<br /><code>Scan</code>では、行キーの範囲を指定したり、バージョン（タイムスタンプ）の範囲を指定したりすることができます。<br />なので、例えば直近1時間のツイートのみを集計対象とする、といったことがMapper/Reducerを修正することなく、設定パラメータを送り込む方法を考えることなく、容易に実現できてしまいます。<br /><br /><h3>設定ファイルについて</h3>Hadoopを擬似分散モード、完全分散モードで実行出来るように、設定ファイルの雛形を準備してあります。<br /><br />擬似分散モードは <code>HDFS NameNode</code> が 9000番ポート、 <code>JobTracker</code> が 9001番ポートで動作している想定です。<br />必要に応じで <code>src/pseudo/resources</code> 以下の設定ファイルを修正してください。<br /><br />コンパイルは以下のとおり。<br /><br /><pre><code>$ mvn -P pseudo clean package</code></pre><br /><br />完全分散モードは <code>HDFS NameNode</code> が <code>node0</code>サーバーの 9000番ポート、 <code>JobTracker</code> が <code>node0</code>サーバーの 9001番ポート、 <code>ZooKeeper Quorum</code> が <code>node0</code>サーバーで動作している想定です。<br />こちらも必要に応じて <code>src/production/resources</code> 以下の設定ファイルを修正してください。<br /><br />コンパイルは以下のとおり。<br /><br /><pre><code>$ mvn -P production clean package</code></pre><br />
+                                    </div>
+
+                                </div>
+                                <div class="asset-footer">
+
+    
+                                    <div class="entry-categories">
+                                        <h4>カテゴリ<span class="delimiter">:</span></h4>
+                                        <ul>
+                                            <li class="entry-category"><a href="http://happy-camper.st/lang/java/hbase/" rel="tag">HBase</a><span class="delimiter">,</span></li> <li class="entry-category"><a href="http://happy-camper.st/lang/java/hadoop/" rel="tag">Hadoop</a><span class="delimiter">,</span></li> <li class="entry-category"><a href="http://happy-camper.st/lang/scala/" rel="tag">Scala</a><span class="delimiter">,</span></li> <li class="entry-category"><a href="http://happy-camper.st/idea/development/cminst/" rel="tag">cminst</a></li>
+                                        </ul>
+                                    </div>
+    
+
+
+                                    <div class="asset-meta">
+                                      <div id="twitter-share-button">
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="vertical" data-text="Coming on Stream その2 - Happy-Camper Street" data-lang="ja">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                    <div id="trackbacks" class="trackbacks">
+    <h2 class="trackbacks-header">トラックバック(3)</h2>
+
+    
+    
+
+
+    
+    
+        
+    <div class="trackbacks-content">
+        
+        <div class="trackback" id="ping-42">
+            <div class="inner">
+                <div class="trackback-header">
+                    <div class="asset-meta">
+                        Happy-Camper Street - <a href="http://happy-camper.st/development/cminst/coming-on-stream-3.html" rel="nofollow">Coming on Stream その3</a> (<a href="#ping-42" rel="nofollow">2010年9月 9日 22:27</a>)
+                    </div>
+                </div>
+                <div class="trackback-content">
+                    <p>
+                        Coming on Streamシリーズやってます。その1その2前２回で、NoS... <a href="http://happy-camper.st/development/cminst/coming-on-stream-3.html" rel="nofollow">続きを読む</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+    
+        
+        <div class="trackback" id="ping-43">
+            <div class="inner">
+                <div class="trackback-header">
+                    <div class="asset-meta">
+                        Happy-Camper Street - <a href="http://happy-camper.st/development/cminst/coming-on-stream-4.html" rel="nofollow">Coming on Stream その4</a> (<a href="#ping-43" rel="nofollow">2010年9月11日 16:01</a>)
+                    </div>
+                </div>
+                <div class="trackback-content">
+                    <p>
+                        Coming on Streamシリーズやってます。その1その2その3作ったもの... <a href="http://happy-camper.st/development/cminst/coming-on-stream-4.html" rel="nofollow">続きを読む</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+    
+        
+        <div class="trackback" id="ping-44">
+            <div class="inner">
+                <div class="trackback-header">
+                    <div class="asset-meta">
+                        Happy-Camper Street - <a href="http://happy-camper.st/development/cminst/coming-on-stream-5.html" rel="nofollow">Coming on Stream その5</a> (<a href="#ping-44" rel="nofollow">2010年9月11日 19:56</a>)
+                    </div>
+                </div>
+                <div class="trackback-content">
+                    <p>
+                        Coming on Streamシリーズ ファーストシーズン最終回。その1その2... <a href="http://happy-camper.st/development/cminst/coming-on-stream-5.html" rel="nofollow">続きを読む</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+        
+    
+</div>
+
+
+                    
+
+
+                        </div>
+                    </div>
+
+
+                    <div id="beta">
+    <div id="beta-inner">
+
+
+    
+    <div class="widget-twittericon widget">
+    <h3 class="widget-header">Twitter Icon</h3>
+    <div class="widget-content">
+<a href="http://twitter.com/ueshin" title="Follow me on Twitter"><img src="http://www.twittericon.com/image/twitter228.png" alt="Twitter Icon" border="0"/></a><br />by <a href="http://www.twittericon.com" title="Twitter Backgrounds">Twitter Backgrounds</a>
+    </div>
+</div><div class="widget-adsense widget">
+    <h3 class="widget-header">AdSense</h3>
+    <div class="widget-content">
+<script type="text/javascript"><!--
+google_ad_client = "pub-8863859888091241";
+/* Happy-Camper Street */
+google_ad_slot = "8636588514";
+google_ad_width = 160;
+google_ad_height = 600;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+    </div>
+</div><div class="widget-creative-commons widget">
+   <div class="widget-content">
+      <a href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />
+      このブログは<a href="http://creativecommons.org/licenses/by/3.0/">クリエイティブ・コモンズ</a>でライセンスされています。
+   </div>
+</div>
+
+<div class="widget-powered widget">
+    <div class="widget-content">
+        <a href="http://www.sixapart.jp/movabletype/"><img src="http://happy-camper.st/mt/mt-static/images/bug-pbmt-white.png" alt="Powered by Movable Type 5.14-ja" width="120" height="75" /></a>
+    </div>
+</div>
+
+
+
+    </div>
+</div>
+
+
+
+    
+<div id="gamma">
+    <div id="gamma-inner">
+    <div class="widget-adsense widget">
+    <h3 class="widget-header">Google検索</h3>
+    <div class="widget-content">
+<style type="text/css">
+@import url(http://www.google.com/cse/api/branding.css);
+</style>
+<div class="cse-branding-bottom" style="background-color:#FFFFFF;color:#000000">
+  <div class="cse-branding-form">
+    <form action="http://www.google.co.jp" id="cse-search-box">
+      <div>
+        <input type="hidden" name="cx" value="partner-pub-8863859888091241:4091907538" />
+        <input type="hidden" name="ie" value="UTF-8" />
+        <input type="text" name="q" size="18" />
+        <input type="submit" name="sa" value="検索" />
+      </div>
+    </form>
+  </div>
+  <div class="cse-branding-logo">
+    <img src="http://www.google.com/images/poweredby_transparent/poweredby_FFFFFF.gif" alt="Google" />
+  </div>
+  <div class="cse-branding-text">
+    カスタム検索
+  </div>
+</div>
+    </div>
+</div>
+<div class="widget-calendar widget">
+    <h3 class="widget-header">2012年9月</h3>
+    <div class="widget-content">
+        <table summary="リンク付きのカレンダー">
+            <tr>
+                <th abbr="日曜日">日</th>
+                <th abbr="月曜日">月</th>
+                <th abbr="火曜日">火</th>
+                <th abbr="水曜日">水</th>
+                <th abbr="木曜日">木</th>
+                <th abbr="金曜日">金</th>
+                <th abbr="土曜日">土</th>
+            </tr>
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    1
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    2
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    3
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    4
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    5
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    6
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    7
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    8
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    9
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    10
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    11
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    12
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    13
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    14
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    15
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    16
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    17
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    18
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    19
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    20
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    21
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    22
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    23
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    24
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    25
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    26
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    27
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    28
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    29
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    30
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+            </tr>
+        
+    
+        </table>
+    </div>
+</div>
+
+<div class="widget-archive widget-archive-category widget">
+    <h3 class="widget-header">カテゴリ</h3>
+    <div class="widget-content">
+    
+        
+        <ul>
+        
+        
+            <li>言語
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/">Java (1)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hbase/">HBase (8)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hbase/workshop/">勉強会 (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hadoop/">Hadoop (14)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hadoop/pig/">Pig (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/maven2/">Maven2 (10)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/maven2/plugins/">プラグイン (5)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/guice/">Guice (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/scala/">Scala (20)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/scala/play/">Play! (6)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/ruby/">Ruby (1)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/objective-c/">Objective-C (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/books/">本 (2)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/idea/">ネタ (3)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li>開発
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/idea/development/cminst/">cminst (5)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/idea/development/siphon/">Siphon (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/trial/">お試し (5)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/trial/esoteric/">奇妙な言語 (3)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/others/">その他 (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+    </div>
+</div>
+
+
+
+
+    <div class="widget-archive-monthly widget-archive widget">
+    <h3 class="widget-header">月別 <a href="http://happy-camper.st/archives.html">アーカイブ</a></h3>
+    <div class="widget-content">
+        <ul>
+        
+            <li><a href="http://happy-camper.st/2011/09/">2011年9月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2011/05/">2011年5月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2011/01/">2011年1月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/12/">2010年12月 (4)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/11/">2010年11月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/10/">2010年10月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/09/">2010年9月 (6)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/07/">2010年7月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/06/">2010年6月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/05/">2010年5月 (5)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/04/">2010年4月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2009/03/">2009年3月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2009/01/">2009年1月 (5)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (11)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (14)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/08/">2008年8月 (1)</a></li>
+        
+        </ul>
+    </div>
+</div>
+        
+    
+
+
+
+<div class="widget-syndication widget">
+    <div class="widget-content">
+        <ul>
+            <li><img src="http://happy-camper.st/mt/mt-static/images/status_icons/feed.gif" alt="購読する" width="9" height="9" /> <a href="http://happy-camper.st/atom.xml">このブログを購読</a></li>
+
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-8145422-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+    </div>
+</div>
+
+
+
+
+                </div>
+            </div>
+
+
+            <div id="footer">
+    <div id="footer-inner">
+        <div id="footer-content">
+            <div class="widget-powered widget">
+                <div class="widget-content">
+                    Powered by <a href="http://www.sixapart.jp/movabletype/">Movable Type</a>
+                </div>
+            </div>
+
+            <div class="widget-creative-commons widget">
+                <div class="widget-content">
+                    このブログは<a href="http://creativecommons.org/licenses/by/3.0/">クリエイティブ・コモンズ</a>でライセンスされています。
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+        </div>
+    </div>
+</body>
+</html>

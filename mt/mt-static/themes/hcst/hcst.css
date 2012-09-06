@@ -1,0 +1,367 @@
+/*
+
+name: Happy-Camper Street
+designer: Takuya UESHIN
+designer_url: http://ueshin.happy-camper.st
+layouts: layout-wtt, layout-twt, layout-wt, layout-tw, layout-wm, layout-mw
+
+*/
+
+body {
+    color: #333333;
+    background-color: #f5f4ef;
+}
+
+a {
+    color: #b33535;
+}
+
+#container-inner {
+    width: 96%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#header-name {
+    color: #755930;
+    font-size: 24px;
+    font-family: Verdana;
+    font-weight: bold;
+}
+
+#header-name a:link, #header-name a:visited {
+    color: #755930;
+    text-decoration: none;
+}
+
+#header-name a:hover {
+    color: #755930;
+    text-decoration: underline;
+}
+
+#header-description {
+    color: #755930;
+    font-size: 12px;
+    font-family: Verdana;
+    font-weight: bold;
+}
+
+#content {
+    background-color: #ffffff;
+    border-top: #cca83d solid 5px;
+    border-left: #cca83d solid 1px;
+    border-right: #ccc19f solid 2px;
+    border-bottom: #ccc19f solid 3px;
+}
+
+#content-inner {
+    overflow: hidden;
+    padding: 10px;
+}
+
+#alpha-inner {
+    padding: 0px;
+    position: relative;
+}
+
+.asset {
+    margin-bottom: 20px;
+}
+
+.asset-header {
+    margin-bottom: 10px;
+}
+
+.asset-name {
+    font-size: 14px;
+    font-family: Verdana;
+    font-weight: bold;
+    padding: 5px 10px 3px;
+    background-color: #f0eee7;
+    border-left: #cc3d3d solid 12px;
+}
+
+.asset-name a:link, .asset-name a:visited {
+    color: #333333;
+    text-decoration: none;
+}
+
+.asset-name a:hover {
+    color: #333333;
+    text-decoration: underline;
+}
+
+.asset-meta {
+    text-align: right;
+    padding: 0 5px;
+}
+
+.asset-content {
+    padding: 0 10px;
+}
+
+.asset-more {
+    margin-top: 1em;
+}
+
+.asset-content h2 {
+    font-size: 16px;
+    font-family: Verdana;
+    font-weight: bold;
+    padding: 5px 10px 3px;
+    border-left: #b33535 solid 12px;
+    border-bottom: #b33535 dotted 1px;
+}
+
+.asset-content h3 {
+    font-size: 12px;
+    font-family: Verdana;
+    font-weight: bold;
+    padding: 5px 10px 3px;
+    border-bottom: #b33535 dotted 1px;
+}
+
+.asset-content ul, .asset-content ol {
+	margin: 0 0 0.5em 30px;
+}
+
+.asset-content blockquote {
+    padding: 10px;
+    margin: 0 30px;
+    border-top: #cc3d3d solid 1px;
+    border-left: #cc3d3d solid 1px;
+    border-right: #b33535 solid 2px;
+    border-bottom: #b33535 solid 2px;
+}
+
+.asset-content pre {
+    color: #ffffff;
+    background-color: #4a825f;
+    padding: 10px;
+    margin: 0 30px;
+    border-top: #cca83d solid 2px;
+    border-left: #cca83d solid 2px;
+    border-right: #755930 solid 2px;
+    border-bottom: #755930 solid 6px;
+	overflow-x: auto;
+}
+
+#beta {
+    font-size: 12px;
+}
+
+#beta-inner, #gamma-inner {
+    background-color: #fff7de;
+}
+
+#gamma {
+    font-size: 12px;
+}
+
+#beta-inner .widget, #gamma-inner .widget {
+    margin-bottom: 10px;
+}
+
+#beta-inner .widget-header, #gamma-inner .widget-header {
+    font-size: 12px;
+    font-family: Verdana;
+    background-color: #cc9f9f;
+    margin: 0px;
+    padding: 3px 5px 2px;
+}
+
+#beta-inner .widget-header a:link, #beta-inner .widget-header a:visited, #gamma-inner .widget-header a:link, #gamma-inner .widget-header a:visited {
+    color: #333333;
+    text-decoration: none;
+}
+
+#beta-inner .widget-header a:hover, #gamma-inner .widget-header a:hover {
+    color: #333333;
+    text-decoration: underline;;
+}
+
+#beta-inner .widget-content, #gamma-inner .widget-content {
+    margin: 0px;
+    padding: 5px;
+    background-color: #ffffff;
+    border: 1px dashed #cc9f9f;
+}
+
+.layout-wtt .widget-content input#search, .layout-twt .widget-content input#search, .layout-wt .widget-content input#search, .layout-tw .widget-content input#search {
+    margin: 0;
+    padding: 0;
+    width: 105px;
+}
+
+.layout-wm .widget-content input#search, .layout-mw .widget-content input#search {
+    margin: 0;
+    padding: 0;
+    width: 235px;
+}
+
+.layout-wtt .widget-calendar th, .layout-twt .widget-calendar th, .layout-wt .widget-calendar th, .layout-tw .widget-calendar th {
+    line-height: 16px;
+    text-align: center;
+    width: 22px;
+    background-color: #edebe2;
+    border-right: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
+}
+
+.layout-wtt .widget-calendar td, .layout-twt .widget-calendar td, .layout-wt .widget-calendar td, .layout-tw .widget-calendar td {
+    line-height: 16px;
+    text-align: center;
+    width: 22px;
+    background-color: #f5f4ef;
+    border-right: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
+}
+
+.layout-wm .widget-calendar th, .layout-mw .widget-calendar th {
+    line-height: 20px;
+    text-align: center;
+    width: 40px;
+    background-color: #edebe2;
+    border-left: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
+}
+
+.layout-wm .widget-calendar td, .layout-mw .widget-calendar td {
+    line-height: 20px;
+    text-align: center;
+    width: 40px;
+    background-color: #f5f4ef;
+    border-left: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
+}
+
+.layout-wtt #alpha {
+    width: 100%;
+    margin-right: -404px;
+}
+
+.layout-wtt #alpha-inner {
+    margin-right: 404px;
+}
+
+.layout-wtt #beta {
+    left: 202px;
+    width: 202px;
+}
+
+.layout-wtt #beta-inner {
+    padding: 10px;
+    margin: 0 0 0 10px;
+}
+
+.layout-wtt #gamma {
+    right: 202px;
+    width: 202px;
+}
+
+.layout-wtt #gamma-inner {
+    padding: 10px;
+    margin: 0 0 0 10px;
+}
+
+.layout-twt #alpha {
+    width: 100%;
+    left: 202px;
+    margin-left: -202px;
+    margin-right: -202px;
+}
+
+.layout-twt #alpha-inner {
+    margin-left: 202px;
+    margin-right: 202px;
+}
+
+.layout-twt #beta {
+    width: 202px;
+    left: -100%;
+    margin-left: 404px;
+    margin-right: -404px;
+}
+
+.layout-twt #beta-inner {
+    padding: 10px;
+    margin: 0 10px 0 0;
+}
+
+.layout-twt #gamma {
+    width: 202px;
+}
+
+.layout-twt #gamma-inner {
+    padding: 10px;
+    margin: 0 0 0 10px;
+}
+
+.layout-wt #alpha {
+    width: 100%;
+    margin-right: -202px;
+}
+
+.layout-wt #alpha-inner {
+    margin-right: 202px;
+}
+
+.layout-wt #beta {
+    width: 202px;
+}
+
+.layout-wt #beta-inner {
+    padding: 10px;
+    margin: 0 0 0 10px;
+}
+
+.layout-tw #alpha {
+    width: 100%;
+    left: 202px;
+    margin-left: -202px;
+}
+
+.layout-tw #alpha-inner {
+    margin-left: 202px;
+}
+
+.layout-tw #beta {
+    width: 202px;
+    left: -100%;
+    margin-left: 202px;
+    margin-right: -202px;
+}
+
+.layout-tw #beta-inner {
+    padding: 10px;
+    margin: 0 10px 0 0;
+}
+
+.layout-wm #alpha {
+    width: 100%;
+    margin-right: -330px;
+}
+
+.layout-wm #alpha #alpha-inner {
+    margin-right: 330px;
+}
+
+.layout-mw #alpha {
+    width: 100%;
+    margin-left: -330px;
+}
+
+.layout-mw #alpha-inner {
+    margin-left: 330px;
+}
+
+.layout-mw #beta {
+    left: -100%;
+    margin-left: 330px;
+    margin-right: -330px;
+}
+
+.layout-mw #beta-inner, .layout-wm #beta-inner {
+    padding: 10px;
+    margin: 0 10px 0 0;
+}

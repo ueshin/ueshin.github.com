@@ -1,0 +1,988 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" id="sixapart-standard">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="Movable Type 5.14-ja" />
+<link rel="stylesheet" href="http://happy-camper.st/styles.css" type="text/css" />
+<link rel="start" href="http://happy-camper.st/" title="Home" />
+<link rel="alternate" type="application/atom+xml" title="Recent Entries" href="http://happy-camper.st/atom.xml" />
+<script type="text/javascript" src="http://happy-camper.st/mt.js"></script>
+<!--
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="http://happy-camper.st/lang/java/hbase/hbase-mapreduce-in-scala.html">
+<dc:title>HBase MapReduce in Scala</dc:title>
+<dc:description>HBaseを使ったMapReduceを実装してみました。題材はいつもと同じですが...</dc:description>
+<dc:creator>Takuya UESHIN</dc:creator>
+<dc:date>2010-07-01T00:21:12+09:00</dc:date>
+<license rdf:resource="http://creativecommons.org/licenses/by/3.0/" />
+</Work>
+<License rdf:about="http://creativecommons.org/licenses/by/3.0/">
+</License>
+</rdf:RDF>
+-->
+
+
+    
+    <link rel="prev bookmark" href="http://happy-camper.st/lang/java/hbase/hbase-on-macosx.html" title="HBase on MacOSX" />
+    <link rel="next bookmark" href="http://happy-camper.st/others/20100724-nosql-hakata.html" title="2010/07/24 NoSQL会@博多" />
+    
+    
+    <title>HBase MapReduce in Scala - Happy-Camper Street</title>
+</head>
+<body id="classic-blog" class="mt-entry-archive layout-wtt">
+    <div id="container">
+        <div id="container-inner">
+
+
+            <div id="header">
+    <div id="header-inner">
+        <div id="header-content">
+
+
+            <div id="header-name"><a href="http://happy-camper.st/" accesskey="1">Happy-Camper Street</a></div>
+            <div id="header-description">とあるフリープログラマの頭ん中。</div>
+
+        </div>
+    </div>
+</div>
+
+
+
+            <div id="content">
+                <div id="content-inner">
+
+
+                    <div id="alpha">
+                        <div id="alpha-inner">
+
+
+                            <div id="entry-42" class="entry-asset asset hentry">
+                                <div class="asset-header">
+                                    <h1 id="page-title" class="asset-name entry-title">HBase MapReduce in Scala</h1>
+                                    <div class="asset-meta">
+                                        <span class="byline">
+
+                                            <span class="vcard author"><a class="fn url" href="http://happy-camper.st">Takuya UESHIN</a></span> (<abbr class="published" title="2010-07-01T00:21:12+09:00">2010年7月 1日 00:21</abbr>)
+
+                                        </span>
+
+
+                                    </div>
+                                </div>
+                                <div class="asset-content entry-content">
+
+                                    <div class="asset-body">
+                                        <code>HBase</code>を使った<code>MapReduce</code>を実装してみました。<br /><br />題材は<a href="http://happy-camper.st/lang/java/hadoop/hadoop-core-0-20-2.html">いつも</a>と同じですが、Scala版のみ実装しました。<br /><br /><ul><li>Hadoop: 0.20.2</li><li>HBase: 0.20.5<br /></li><li>Scala: 2.8.0.RC6</li></ul><br />を
+利用しています。<br /><br /><pre><code>$ svn checkout https://happy-camper.st/svn/hadoop/tags/hbase-aggregate-0.20.1 hbase-aggregate</code></pre><br />で
+利用できます。<br /><br />また <a href="http://hadoop.happy-camper.st/browser/tags/hbase-aggregate-0.20.1" target="_blank">http://hadoop.happy-camper.st/browser/tags/hbase-aggregate-0.20.1</a>
+でブラウズできます。<br /><br />
+                                    </div>
+
+
+                                    <div id="more" class="asset-more">
+                                        <h2>概要</h2>２つの<code>MapReduce</code>プログラムを作成します。<br /><br /><ol><li><code>CombinedLogLoader</code></li><li><code>Aggregator</code></li></ol><br />プログラムで利用する<code>access</code>テーブルの定義は次の通りです。<br /><br /><ul><li>行キー : リモートアドレス</li><li>列ファミリー　: "log"<br /></li><li>修飾子 : リクエストパス</li><li>バージョン : リクエスト日時<br /></li><li>値 : <code>CombinedLog</code>インスタンス<br /></li></ul><br /><pre><code>hbase&gt; create 'access', { NAME =&gt; 'log', VERSIONS =&gt; java.lang.Integer::MAX_VALUE }</code></pre><br /><h2>実装</h2><h3>準備</h3>HBaseのライブラリは、Maven2レポジトリに登録されていないようですので、ローカルでインストールしてしまいます。<br />必要なファイルは<code>hbase-0.20.5.jar</code>と<code>zookeeper-3.2.2.jar</code>の２つです。<br /><br /><pre><code>$ mvn install:install-file -Dfile=\${HBASE_HOME}/hbase-0.20.5.jar -DgroupId=org.apache.hadoop -DartifactId=hbase -Dversion=0.20.5 -Dpackaging=jar
+$ mvn install:install-file -Dfile=\${HBASE_HOME}/lib/zookeeper-3.2.2.jar -DgroupId=org.apache.hadoop -DartifactId=zookeeper -Dversion=3.2.2 -Dpackaging=jar</code></pre><br /><h3><code>CombinedLogLoader</code></h3>HDFS上にあるアクセスログをパースしつつHBaseの<code>access</code>テーブルへロードします。<br /><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-aggregate-0.20.1/src/main/scala/st/happy_camper/hbase/aggregate/CombinedLogLoader.scala" target="_blank">CombinedLogLoader.scala</a><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-aggregate-0.20.1/src/main/scala/st/happy_camper/hbase/aggregate/mapreduce/CombinedLogLoadMapper.scala" target="_blank">CombinedLogLoadMapper.scala</a><br /><br />入力がファイルシステム上のテキストファイルなので、<code>Mapper</code>への入力は<code>TextInputFormat</code>を使います。<br /><br />また、今回は<code>Mapper</code>の出力をそのままHBaseへと流せばよいので、<code>Reducer</code>には<code>org.apache.hadoop.hbase.mapreduce.IdentityTableReducer</code>を利用します。<br />この場合、<code>Mapper</code>の出力キーを<code>ImmutableBytesWritable</code>クラス、出力値を<code>Put</code>クラスもしくは<code>Delete</code>クラスとします。<br /><br />設定には <code>TableMapReduceUtil#initTableReduceJob</code>メソッドを利用し、出力先テーブル名と<code>Reducer</code>クラスを指定します。<br /><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-aggregate-0.20.1/src/main/scala/st/happy_camper/hbase/aggregate/parser/CombinedLogParser.scala" target="_blank">CombinedLogParser.scala</a><br /><br />ログのパースには、<a href="http://happy-camper.st/lang/scala/parser-combinator.html">以前作成した</a><code>CombinedLogParser</code>を利用しました。<br /><br /><h3>Aggregator</h3>HBaseにロードされたログを集計します。<br /><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-aggregate-0.20.1/src/main/scala/st/happy_camper/hbase/aggregate/Aggregator.scala" target="_blank">Aggregator.scala</a><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-aggregate-0.20.1/src/main/scala/st/happy_camper/hbase/aggregate/mapreduce/AggregateMapper.scala" target="_blank">AggregateMapper.scala</a><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-aggregate-0.20.1/src/main/scala/st/happy_camper/hbase/aggregate/mapreduce/AggregateCombiner.scala" target="_blank">AggregateCombiner.scala</a><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-aggregate-0.20.1/src/main/scala/st/happy_camper/hbase/aggregate/mapreduce/AggregateReducer.scala" target="_blank">AggregateReducer.scala</a><br /><br />こちらは<code>Mapper</code>の入力がHBaseのテーブルとなるので、<code>TableMapReduceUtil#initTableMapperJob</code>メソッドで入力テーブル名、<code>scan</code>、<code>Mapper</code>クラスなどを設定します。<br /><br /><code>Scan</code>で、<code>Mapper</code>への入力対象となる行や列、バージョンを指定できます。<br /><br /><code>Mapper</code>へは、１回の処理で１つの行が<code>Result</code>インスタンスとして入ってきますので、必要なデータを取り出して処理します。<br /><br /><code>Combiner</code>、<code>Reducer</code>はよくある集計処理です。<br /><br /><h2>実行</h2>HadoopとHBaseを起動しておきます。<br />また、<code>access</code>テーブルを作成しておきます。<br /><br /><h3>コンパイル</h3>Maven2でコンパイルします。<br /><br /><pre><code>$ mvn clean package</code></pre><br /><h3>データロード</h3>HDFS上にアクセスログを設置し、データロードを実行します。<br /><br /><pre><code>$ /usr/local/hadoop/bin/hadoop fs -ls input
+Found 3 items
+-rw-r--r--   1 ueshin staff    8216533 2010-05-17 23:56 /user/ueshin/input/201001.log
+-rw-r--r--   1 ueshin staff    7994287 2010-05-17 23:56 /user/ueshin/input/201002.log
+-rw-r--r--   1 ueshin staff    8948672 2010-05-17 23:56 /user/ueshin/input/201003.log
+
+$ sh target/appassembler/bin/loader input</code></pre><br />ロードできました。<br />HBase Shell で確認してみます。<br /><br /><pre><code>hbase&gt; count 'access'<br />Current count: 1000, row: 188.92.74.80
+Current count: 2000, row: 219.42.56.38
+Current count: 3000, row: 65.55.215.84
+3451 row(s) in 0.9290 seconds</code></pre><br />データが入っています。<br /><br /><h3>集計</h3>引き続き集計を行ないます。<br /><br /><pre><code>$ sh target/appassembler/bin/aggregator output
+$ \${HADOOP_HOME}/bin/hadoop -ls output
+$ \${HADOOP_HOME}/bin/hadoop -cat output/part-r-00000</code></pre><br />集計結果が表示されます。<br /><br />
+                                    </div>
+
+                                </div>
+                                <div class="asset-footer">
+
+    
+                                    <div class="entry-categories">
+                                        <h4>カテゴリ<span class="delimiter">:</span></h4>
+                                        <ul>
+                                            <li class="entry-category"><a href="http://happy-camper.st/lang/java/hbase/" rel="tag">HBase</a><span class="delimiter">,</span></li> <li class="entry-category"><a href="http://happy-camper.st/lang/scala/" rel="tag">Scala</a></li>
+                                        </ul>
+                                    </div>
+    
+
+
+                                    <div class="asset-meta">
+                                      <div id="twitter-share-button">
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="vertical" data-text="HBase MapReduce in Scala - Happy-Camper Street" data-lang="ja">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                    
+                    
+
+
+                        </div>
+                    </div>
+
+
+                    <div id="beta">
+    <div id="beta-inner">
+
+
+    
+    <div class="widget-twittericon widget">
+    <h3 class="widget-header">Twitter Icon</h3>
+    <div class="widget-content">
+<a href="http://twitter.com/ueshin" title="Follow me on Twitter"><img src="http://www.twittericon.com/image/twitter228.png" alt="Twitter Icon" border="0"/></a><br />by <a href="http://www.twittericon.com" title="Twitter Backgrounds">Twitter Backgrounds</a>
+    </div>
+</div><div class="widget-adsense widget">
+    <h3 class="widget-header">AdSense</h3>
+    <div class="widget-content">
+<script type="text/javascript"><!--
+google_ad_client = "pub-8863859888091241";
+/* Happy-Camper Street */
+google_ad_slot = "8636588514";
+google_ad_width = 160;
+google_ad_height = 600;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+    </div>
+</div><div class="widget-creative-commons widget">
+   <div class="widget-content">
+      <a href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />
+      このブログは<a href="http://creativecommons.org/licenses/by/3.0/">クリエイティブ・コモンズ</a>でライセンスされています。
+   </div>
+</div>
+
+<div class="widget-powered widget">
+    <div class="widget-content">
+        <a href="http://www.sixapart.jp/movabletype/"><img src="http://happy-camper.st/mt/mt-static/images/bug-pbmt-white.png" alt="Powered by Movable Type 5.14-ja" width="120" height="75" /></a>
+    </div>
+</div>
+
+
+
+    </div>
+</div>
+
+
+
+    
+<div id="gamma">
+    <div id="gamma-inner">
+    <div class="widget-adsense widget">
+    <h3 class="widget-header">Google検索</h3>
+    <div class="widget-content">
+<style type="text/css">
+@import url(http://www.google.com/cse/api/branding.css);
+</style>
+<div class="cse-branding-bottom" style="background-color:#FFFFFF;color:#000000">
+  <div class="cse-branding-form">
+    <form action="http://www.google.co.jp" id="cse-search-box">
+      <div>
+        <input type="hidden" name="cx" value="partner-pub-8863859888091241:4091907538" />
+        <input type="hidden" name="ie" value="UTF-8" />
+        <input type="text" name="q" size="18" />
+        <input type="submit" name="sa" value="検索" />
+      </div>
+    </form>
+  </div>
+  <div class="cse-branding-logo">
+    <img src="http://www.google.com/images/poweredby_transparent/poweredby_FFFFFF.gif" alt="Google" />
+  </div>
+  <div class="cse-branding-text">
+    カスタム検索
+  </div>
+</div>
+    </div>
+</div>
+<div class="widget-calendar widget">
+    <h3 class="widget-header">2012年9月</h3>
+    <div class="widget-content">
+        <table summary="リンク付きのカレンダー">
+            <tr>
+                <th abbr="日曜日">日</th>
+                <th abbr="月曜日">月</th>
+                <th abbr="火曜日">火</th>
+                <th abbr="水曜日">水</th>
+                <th abbr="木曜日">木</th>
+                <th abbr="金曜日">金</th>
+                <th abbr="土曜日">土</th>
+            </tr>
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    1
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    2
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    3
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    4
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    5
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    6
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    7
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    8
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    9
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    10
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    11
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    12
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    13
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    14
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    15
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    16
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    17
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    18
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    19
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    20
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    21
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    22
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    23
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    24
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    25
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    26
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    27
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    28
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    29
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    30
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+            </tr>
+        
+    
+        </table>
+    </div>
+</div>
+
+<div class="widget-archive widget-archive-category widget">
+    <h3 class="widget-header">カテゴリ</h3>
+    <div class="widget-content">
+    
+        
+        <ul>
+        
+        
+            <li>言語
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/">Java (1)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hbase/">HBase (8)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hbase/workshop/">勉強会 (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hadoop/">Hadoop (14)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hadoop/pig/">Pig (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/maven2/">Maven2 (10)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/maven2/plugins/">プラグイン (5)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/guice/">Guice (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/scala/">Scala (20)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/scala/play/">Play! (6)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/ruby/">Ruby (1)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/objective-c/">Objective-C (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/books/">本 (2)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/idea/">ネタ (3)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li>開発
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/idea/development/cminst/">cminst (5)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/idea/development/siphon/">Siphon (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/trial/">お試し (5)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/trial/esoteric/">奇妙な言語 (3)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/others/">その他 (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+    </div>
+</div>
+
+
+
+
+    <div class="widget-archive-monthly widget-archive widget">
+    <h3 class="widget-header">月別 <a href="http://happy-camper.st/archives.html">アーカイブ</a></h3>
+    <div class="widget-content">
+        <ul>
+        
+            <li><a href="http://happy-camper.st/2011/09/">2011年9月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2011/05/">2011年5月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2011/01/">2011年1月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/12/">2010年12月 (4)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/11/">2010年11月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/10/">2010年10月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/09/">2010年9月 (6)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/07/">2010年7月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/06/">2010年6月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/05/">2010年5月 (5)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/04/">2010年4月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2009/03/">2009年3月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2009/01/">2009年1月 (5)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (11)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (14)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/08/">2008年8月 (1)</a></li>
+        
+        </ul>
+    </div>
+</div>
+        
+    
+
+
+
+<div class="widget-syndication widget">
+    <div class="widget-content">
+        <ul>
+            <li><img src="http://happy-camper.st/mt/mt-static/images/status_icons/feed.gif" alt="購読する" width="9" height="9" /> <a href="http://happy-camper.st/atom.xml">このブログを購読</a></li>
+
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-8145422-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+    </div>
+</div>
+
+
+
+
+                </div>
+            </div>
+
+
+            <div id="footer">
+    <div id="footer-inner">
+        <div id="footer-content">
+            <div class="widget-powered widget">
+                <div class="widget-content">
+                    Powered by <a href="http://www.sixapart.jp/movabletype/">Movable Type</a>
+                </div>
+            </div>
+
+            <div class="widget-creative-commons widget">
+                <div class="widget-content">
+                    このブログは<a href="http://creativecommons.org/licenses/by/3.0/">クリエイティブ・コモンズ</a>でライセンスされています。
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+        </div>
+    </div>
+</body>
+</html>

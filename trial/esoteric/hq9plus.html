@@ -1,0 +1,1315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" id="sixapart-standard">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="Movable Type 5.14-ja" />
+<link rel="stylesheet" href="http://happy-camper.st/styles.css" type="text/css" />
+<link rel="start" href="http://happy-camper.st/" title="Home" />
+<link rel="alternate" type="application/atom+xml" title="Recent Entries" href="http://happy-camper.st/atom.xml" />
+<script type="text/javascript" src="http://happy-camper.st/mt.js"></script>
+<!--
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="http://happy-camper.st/trial/esoteric/hq9plus.html">
+<dc:title>HQ9+</dc:title>
+<dc:description>Rubyで作る奇妙なプログラミング言語 ~Esoteric Language~に...</dc:description>
+<dc:creator>Takuya UESHIN</dc:creator>
+<dc:date>2009-01-12T16:31:20+09:00</dc:date>
+<license rdf:resource="http://creativecommons.org/licenses/by/3.0/" />
+</Work>
+<License rdf:about="http://creativecommons.org/licenses/by/3.0/">
+</License>
+</rdf:RDF>
+-->
+
+
+    
+    <link rel="prev bookmark" href="http://happy-camper.st/books/esoteric-language.html" title="Rubyで作る奇妙なプログラミング言語 ~Esoteric Language~" />
+    <link rel="next bookmark" href="http://happy-camper.st/trial/esoteric/brainfuck.html" title="Brainf*ck" />
+    
+    
+    <title>HQ9+ - Happy-Camper Street</title>
+</head>
+<body id="classic-blog" class="mt-entry-archive layout-wtt">
+    <div id="container">
+        <div id="container-inner">
+
+
+            <div id="header">
+    <div id="header-inner">
+        <div id="header-content">
+
+
+            <div id="header-name"><a href="http://happy-camper.st/" accesskey="1">Happy-Camper Street</a></div>
+            <div id="header-description">とあるフリープログラマの頭ん中。</div>
+
+        </div>
+    </div>
+</div>
+
+
+
+            <div id="content">
+                <div id="content-inner">
+
+
+                    <div id="alpha">
+                        <div id="alpha-inner">
+
+
+                            <div id="entry-29" class="entry-asset asset hentry">
+                                <div class="asset-header">
+                                    <h1 id="page-title" class="asset-name entry-title">HQ9+</h1>
+                                    <div class="asset-meta">
+                                        <span class="byline">
+
+                                            <span class="vcard author"><a class="fn url" href="http://happy-camper.st">Takuya UESHIN</a></span> (<abbr class="published" title="2009-01-12T16:31:20+09:00">2009年1月12日 16:31</abbr>)
+
+                                        </span>
+
+
+                                        <span class="separator">|</span> <a href="http://happy-camper.st/trial/esoteric/hq9plus.html#trackbacks">トラックバック(1)</a>
+
+                                    </div>
+                                </div>
+                                <div class="asset-content entry-content">
+
+                                    <div class="asset-body">
+                                        <a href="http://happy-camper.st/books/esoteric-language.html">Rubyで作る奇妙なプログラミング言語 ~Esoteric Language~</a>にて<a href="http://www.amazon.co.jp/gp/redirect.html?ie=UTF8&amp;location=http%3A%2F%2Fwww.amazon.co.jp%2FRuby%25E3%2581%25A7%25E4%25BD%259C%25E3%2582%258B%25E5%25A5%2587%25E5%25A6%2599%25E3%2581%25AA%25E3%2583%2597%25E3%2583%25AD%25E3%2582%25B0%25E3%2583%25A9%25E3%2583%259F%25E3%2583%25B3%25E3%2582%25B0%25E8%25A8%2580%25E8%25AA%259E-%7EEsoteric-Language%7E-%25E5%258E%259F-%25E6%2582%25A0%2Fdp%2F4839927847%3Fie%3DUTF8%26s%3Dbooks%26qid%3D1231741467%26sr%3D1-1&amp;tag=ueshin1-22&amp;linkCode=ur2&amp;camp=247&amp;creative=1211" target="_blank">紹介した本</a><img src="http://www.assoc-amazon.jp/e/ir?t=ueshin1-22&amp;l=ur2&amp;o=9" alt="" style="border: medium none  ! important; margin: 0px ! important;" border="0" width="1" height="1" />の中から、「<a href="http://ja.wikipedia.org/wiki/HQ9%2B" target="_blank">HQ9+</a>」言語をJavaで実装してみます。<br /><br />「<a href="http://ja.wikipedia.org/wiki/HQ9%2B" target="_blank">HQ9+</a>」言語とは、<br /><br /><blockquote><ul><li>Hコマンドは文字列"Hello, world!"を出力する。</li><li>Qコマンドはプログラムのソースコードを出力する。</li><li>9コマンドは『<i>99 Bottles of Beer</i>』（アメリカの数え歌で、プログラミングの例題でよく利用される）の歌詞を出力する。</li><li>+コマンドはアキュムレータをインクリメント（1だけ増やす）する。</li></ul><div align="right"><a href="http://ja.wikipedia.org/wiki/HQ9%2B" target="_blank">Wikipedia</a>より</div></blockquote><br />です。<br /><br />というわけで早速実装してみます。<br />
+                                    </div>
+
+
+                                    <div id="more" class="asset-more">
+                                        <h2>まずは本のRubyソースをほぼそのまま移植。</h2><br /><pre><code>package st.happy_camper.esoteric.hq9plus;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+/**
+ * @author ueshin
+ */
+public class HQ9Plus {
+
+    private final String src;
+
+    private int count = 0;
+
+    public HQ9Plus(String src) {
+        this.src = src;
+    }
+
+    public void run() {
+        for(char c : src.toCharArray()) {
+            if(c == 'H') {
+                hello();
+            }
+            else if(c == 'Q') {
+                printSource();
+            }
+            else if(c == '9') {
+                print99BottlesOfBeer();
+            }
+            else if(c == '+') {
+                increment();
+            }
+        }
+    }
+
+    private void hello() {
+        System.out.println("Hello World!");
+    }
+
+    private void printSource() {
+        System.out.println(src);
+    }
+
+    private void print99BottlesOfBeer() {
+        for(int k = 99; k &gt;= 0; k--) {
+            String before;
+            String after;
+            switch(k) {
+                case 0:
+                    before = "No more bottles";
+                    after = "99 bottles";
+                    break;
+                case 1:
+                    before = "1 bottle";
+                    after = "no more bottles";
+                    break;
+                case 2:
+                    before = "2 bottles";
+                    after = "1 bottle";
+                    break;
+                default:
+                    before = k + " bottles";
+                    after = (k - 1) + " bottles";
+            }
+
+            String action;
+            if(k == 0) {
+                action = "Go to the storea and buy some more";
+            }
+            else {
+                action = "Take one down and pass it around";
+            }
+
+            System.out.println(before + " of beer on the wall, "
+                    + before.toLowerCase() + " of beer.");
+            System.out.println(action + ", " + after + " of beer on the wall.");
+            if(k != 0) {
+                System.out.println();
+            }
+        }
+    }
+
+    private void increment() {
+        count++;
+    }
+
+    /**
+     * @param args
+     * @throws IOException
+     */
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = null;
+        try {
+            if(args.length &gt; 0) {
+                reader = new BufferedReader(new FileReader(args[0]));
+            }
+            else {
+                reader = new BufferedReader(new InputStreamReader(System.in));
+            }
+
+            StringBuilder src = new StringBuilder();
+
+            String line;
+            while((line = reader.readLine()) != null) {
+                src.append(line);
+                src.append("\n");
+            }
+
+            new HQ9Plus(src.toString()).run();
+        }
+        finally {
+            if(reader != null) {
+                reader.close();
+                reader = null;
+            }
+        }
+    }
+
+}</code></pre><br />使い方<br /><br /><pre><code>$ echo 'HQ' | java st.happy_camper.esoteric.hq9plus.HQ9Plus
+Hello World!
+HQ</code></pre><br /><h2>もう少しJavaっぽく?</h2><br /><pre><code>package st.happy_camper.esoteric.hq9plus;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author ueshin
+ */
+public class HQ9PlusPlus {
+
+    public interface CommandProcessor {
+
+        public void process();
+    }
+
+    private final String src;
+
+    private final Map&lt;Character, CommandProcessor&gt; processors = new HashMap&lt;Character, CommandProcessor&gt;();
+
+    /**
+     * @param src
+     */
+    public HQ9PlusPlus(String src) {
+        this.src = src;
+
+        processors.put('H', new HelloWorldProcessor());
+        processors.put('Q', new QuineProcessor(src));
+        processors.put('9', new NinetyNineBottlesOfBeerProcessor());
+        processors.put('+', new IncrementProcessor());
+    }
+
+    /**
+     * @param src
+     * @param processors
+     */
+    public HQ9PlusPlus(String src,
+            Map&lt;Character, ? extends CommandProcessor&gt; processors) {
+        this(src);
+        this.processors.putAll(processors);
+    }
+
+    /**
+     * 
+     */
+    public void run() {
+        for(char c : src.toCharArray()) {
+            CommandProcessor processor = processors.get(c);
+            if(processor != null) {
+                processor.process();
+            }
+        }
+    }
+
+    /**
+     * @param args
+     * @throws IOException
+     */
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = null;
+        try {
+            if(args.length &gt; 0) {
+                reader = new BufferedReader(new FileReader(args[0]));
+            }
+            else {
+                reader = new BufferedReader(new InputStreamReader(System.in));
+            }
+
+            StringBuilder src = new StringBuilder();
+
+            String line;
+            while((line = reader.readLine()) != null) {
+                src.append(line);
+                src.append("\n");
+            }
+
+            new HQ9PlusPlus(src.toString()).run();
+        }
+        finally {
+            if(reader != null) {
+                try {
+                    reader.close();
+                    reader = null;
+                }
+                catch(IOException e) {
+                }
+            }
+        }
+    }
+
+    /**
+     * @author ueshin
+     */
+    private static class HelloWorldProcessor implements CommandProcessor {
+
+        @Override
+        public void process() {
+            System.out.println("Hello World!");
+        }
+    }
+
+    /**
+     * @author ueshin
+     */
+    private static class QuineProcessor implements CommandProcessor {
+
+        private final String src;
+
+        /**
+         * @param src
+         */
+        public QuineProcessor(String src) {
+            this.src = src;
+        }
+
+        @Override
+        public void process() {
+            System.out.print(src);
+        }
+    }
+
+    /**
+     * @author ueshin
+     */
+    private static class NinetyNineBottlesOfBeerProcessor implements
+            CommandProcessor {
+
+        @Override
+        public void process() {
+            for(int k = 99; k &gt;= 0; k--) {
+                String before;
+                String after;
+                switch(k) {
+                    case 0:
+                        before = "No more bottles";
+                        after = "99 bottles";
+                        break;
+                    case 1:
+                        before = "1 bottle";
+                        after = "no more bottles";
+                        break;
+                    case 2:
+                        before = "2 bottles";
+                        after = "1 bottle";
+                        break;
+                    default:
+                        before = k + " bottles";
+                        after = (k - 1) + " bottles";
+                        break;
+                }
+
+                String action;
+                if(k == 0) {
+                    action = "Go to the storea and buy some more";
+                }
+                else {
+                    action = "Take one down and pass it around";
+                }
+
+                System.out.println(before + " of beer on the wall, "
+                        + before.toLowerCase() + " of beer.");
+                System.out.println(action + ", " + after
+                        + " of beer on the wall.");
+                if(k != 0) {
+                    System.out.println();
+                }
+            }
+        }
+    }
+
+    /**
+     * @author ueshin
+     */
+    private static class IncrementProcessor implements CommandProcessor {
+
+        private int counter = 0;
+
+        @Override
+        public void process() {
+            counter++;
+        }
+    }
+
+}</code></pre><br />各コマンドをそれぞれのクラスで処理させるようにしました。<br /><br />これにより拡張可能に。<br /><code>CommandProcessor</code>インターフェイスを実装したクラスをコマンドとのマップに収めて、コンストラクタに渡してあげればそのコマンドも受け付けるようになります。<br />また、デフォルトのコマンドも上書きするので、処理の変更をすることも出来ます。<br /><br />
+                                    </div>
+
+                                </div>
+                                <div class="asset-footer">
+
+    
+                                    <div class="entry-categories">
+                                        <h4>カテゴリ<span class="delimiter">:</span></h4>
+                                        <ul>
+                                            <li class="entry-category"><a href="http://happy-camper.st/trial/esoteric/" rel="tag">奇妙な言語</a></li>
+                                        </ul>
+                                    </div>
+    
+
+
+                                    <div class="asset-meta">
+                                      <div id="twitter-share-button">
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="vertical" data-text="HQ9+ - Happy-Camper Street" data-lang="ja">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                    <div id="trackbacks" class="trackbacks">
+    <h2 class="trackbacks-header">トラックバック(1)</h2>
+
+    
+    
+
+
+    
+    
+        
+    <div class="trackbacks-content">
+        
+        <div class="trackback" id="ping-22">
+            <div class="inner">
+                <div class="trackback-header">
+                    <div class="asset-meta">
+                        Happy-Camper Street - <a href="http://happy-camper.st/trial/esoteric/whitespace.html" rel="nofollow">Whitespace</a> (<a href="#ping-22" rel="nofollow">2009年1月22日 02:10</a>)
+                    </div>
+                </div>
+                <div class="trackback-content">
+                    <p>
+                        Rubyで作る奇妙なプログラミング言語 ~Esoteric Language~... <a href="http://happy-camper.st/trial/esoteric/whitespace.html" rel="nofollow">続きを読む</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+        
+    
+</div>
+
+
+                    
+
+
+                        </div>
+                    </div>
+
+
+                    <div id="beta">
+    <div id="beta-inner">
+
+
+    
+    <div class="widget-twittericon widget">
+    <h3 class="widget-header">Twitter Icon</h3>
+    <div class="widget-content">
+<a href="http://twitter.com/ueshin" title="Follow me on Twitter"><img src="http://www.twittericon.com/image/twitter228.png" alt="Twitter Icon" border="0"/></a><br />by <a href="http://www.twittericon.com" title="Twitter Backgrounds">Twitter Backgrounds</a>
+    </div>
+</div><div class="widget-adsense widget">
+    <h3 class="widget-header">AdSense</h3>
+    <div class="widget-content">
+<script type="text/javascript"><!--
+google_ad_client = "pub-8863859888091241";
+/* Happy-Camper Street */
+google_ad_slot = "8636588514";
+google_ad_width = 160;
+google_ad_height = 600;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+    </div>
+</div><div class="widget-creative-commons widget">
+   <div class="widget-content">
+      <a href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />
+      このブログは<a href="http://creativecommons.org/licenses/by/3.0/">クリエイティブ・コモンズ</a>でライセンスされています。
+   </div>
+</div>
+
+<div class="widget-powered widget">
+    <div class="widget-content">
+        <a href="http://www.sixapart.jp/movabletype/"><img src="http://happy-camper.st/mt/mt-static/images/bug-pbmt-white.png" alt="Powered by Movable Type 5.14-ja" width="120" height="75" /></a>
+    </div>
+</div>
+
+
+
+    </div>
+</div>
+
+
+
+    
+<div id="gamma">
+    <div id="gamma-inner">
+    <div class="widget-adsense widget">
+    <h3 class="widget-header">Google検索</h3>
+    <div class="widget-content">
+<style type="text/css">
+@import url(http://www.google.com/cse/api/branding.css);
+</style>
+<div class="cse-branding-bottom" style="background-color:#FFFFFF;color:#000000">
+  <div class="cse-branding-form">
+    <form action="http://www.google.co.jp" id="cse-search-box">
+      <div>
+        <input type="hidden" name="cx" value="partner-pub-8863859888091241:4091907538" />
+        <input type="hidden" name="ie" value="UTF-8" />
+        <input type="text" name="q" size="18" />
+        <input type="submit" name="sa" value="検索" />
+      </div>
+    </form>
+  </div>
+  <div class="cse-branding-logo">
+    <img src="http://www.google.com/images/poweredby_transparent/poweredby_FFFFFF.gif" alt="Google" />
+  </div>
+  <div class="cse-branding-text">
+    カスタム検索
+  </div>
+</div>
+    </div>
+</div>
+<div class="widget-calendar widget">
+    <h3 class="widget-header">2012年9月</h3>
+    <div class="widget-content">
+        <table summary="リンク付きのカレンダー">
+            <tr>
+                <th abbr="日曜日">日</th>
+                <th abbr="月曜日">月</th>
+                <th abbr="火曜日">火</th>
+                <th abbr="水曜日">水</th>
+                <th abbr="木曜日">木</th>
+                <th abbr="金曜日">金</th>
+                <th abbr="土曜日">土</th>
+            </tr>
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    1
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    2
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    3
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    4
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    5
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    6
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    7
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    8
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    9
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    10
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    11
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    12
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    13
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    14
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    15
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    16
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    17
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    18
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    19
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    20
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    21
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    22
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    23
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    24
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    25
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    26
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    27
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    28
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    29
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    30
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+            </tr>
+        
+    
+        </table>
+    </div>
+</div>
+
+<div class="widget-archive widget-archive-category widget">
+    <h3 class="widget-header">カテゴリ</h3>
+    <div class="widget-content">
+    
+        
+        <ul>
+        
+        
+            <li>言語
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/">Java (1)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hbase/">HBase (8)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hbase/workshop/">勉強会 (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hadoop/">Hadoop (14)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hadoop/pig/">Pig (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/maven2/">Maven2 (10)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/maven2/plugins/">プラグイン (5)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/guice/">Guice (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/scala/">Scala (20)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/scala/play/">Play! (6)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/ruby/">Ruby (1)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/objective-c/">Objective-C (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/books/">本 (2)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/idea/">ネタ (3)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li>開発
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/idea/development/cminst/">cminst (5)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/idea/development/siphon/">Siphon (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/trial/">お試し (5)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/trial/esoteric/">奇妙な言語 (3)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/others/">その他 (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+    </div>
+</div>
+
+
+
+
+    <div class="widget-archive-monthly widget-archive widget">
+    <h3 class="widget-header">月別 <a href="http://happy-camper.st/archives.html">アーカイブ</a></h3>
+    <div class="widget-content">
+        <ul>
+        
+            <li><a href="http://happy-camper.st/2011/09/">2011年9月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2011/05/">2011年5月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2011/01/">2011年1月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/12/">2010年12月 (4)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/11/">2010年11月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/10/">2010年10月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/09/">2010年9月 (6)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/07/">2010年7月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/06/">2010年6月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/05/">2010年5月 (5)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/04/">2010年4月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2009/03/">2009年3月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2009/01/">2009年1月 (5)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (11)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (14)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/08/">2008年8月 (1)</a></li>
+        
+        </ul>
+    </div>
+</div>
+        
+    
+
+
+
+<div class="widget-syndication widget">
+    <div class="widget-content">
+        <ul>
+            <li><img src="http://happy-camper.st/mt/mt-static/images/status_icons/feed.gif" alt="購読する" width="9" height="9" /> <a href="http://happy-camper.st/atom.xml">このブログを購読</a></li>
+
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-8145422-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+    </div>
+</div>
+
+
+
+
+                </div>
+            </div>
+
+
+            <div id="footer">
+    <div id="footer-inner">
+        <div id="footer-content">
+            <div class="widget-powered widget">
+                <div class="widget-content">
+                    Powered by <a href="http://www.sixapart.jp/movabletype/">Movable Type</a>
+                </div>
+            </div>
+
+            <div class="widget-creative-commons widget">
+                <div class="widget-content">
+                    このブログは<a href="http://creativecommons.org/licenses/by/3.0/">クリエイティブ・コモンズ</a>でライセンスされています。
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+        </div>
+    </div>
+</body>
+</html>

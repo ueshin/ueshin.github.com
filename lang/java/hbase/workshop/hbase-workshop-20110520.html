@@ -1,0 +1,974 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" id="sixapart-standard">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="Movable Type 5.14-ja" />
+<link rel="stylesheet" href="http://happy-camper.st/styles.css" type="text/css" />
+<link rel="start" href="http://happy-camper.st/" title="Home" />
+<link rel="alternate" type="application/atom+xml" title="Recent Entries" href="http://happy-camper.st/atom.xml" />
+<script type="text/javascript" src="http://happy-camper.st/mt.js"></script>
+<!--
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="http://happy-camper.st/lang/java/hbase/workshop/hbase-workshop-20110520.html">
+<dc:title>HBaseワークショップ(第一回)</dc:title>
+<dc:description>先日5月20日(金)にHBaseワークショップ(第一回)が開催されました。HBa...</dc:description>
+<dc:creator>Takuya UESHIN</dc:creator>
+<dc:date>2011-05-28T22:54:09+09:00</dc:date>
+<license rdf:resource="http://creativecommons.org/licenses/by/3.0/" />
+</Work>
+<License rdf:about="http://creativecommons.org/licenses/by/3.0/">
+</License>
+</rdf:RDF>
+-->
+
+
+    
+    <link rel="prev bookmark" href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-6.html" title="Play framework with Scala その6" />
+    <link rel="next bookmark" href="http://happy-camper.st/lang/java/hbase/togetter-hbase-compaction.html" title="HBaseのコンパクションまわりを調べてみた件。" />
+    
+    
+    <title>HBaseワークショップ(第一回) - Happy-Camper Street</title>
+</head>
+<body id="classic-blog" class="mt-entry-archive layout-wtt">
+    <div id="container">
+        <div id="container-inner">
+
+
+            <div id="header">
+    <div id="header-inner">
+        <div id="header-content">
+
+
+            <div id="header-name"><a href="http://happy-camper.st/" accesskey="1">Happy-Camper Street</a></div>
+            <div id="header-description">とあるフリープログラマの頭ん中。</div>
+
+        </div>
+    </div>
+</div>
+
+
+
+            <div id="content">
+                <div id="content-inner">
+
+
+                    <div id="alpha">
+                        <div id="alpha-inner">
+
+
+                            <div id="entry-58" class="entry-asset asset hentry">
+                                <div class="asset-header">
+                                    <h1 id="page-title" class="asset-name entry-title">HBaseワークショップ(第一回)</h1>
+                                    <div class="asset-meta">
+                                        <span class="byline">
+
+                                            <span class="vcard author"><a class="fn url" href="http://happy-camper.st">Takuya UESHIN</a></span> (<abbr class="published" title="2011-05-28T22:54:09+09:00">2011年5月28日 22:54</abbr>)
+
+                                        </span>
+
+
+                                    </div>
+                                </div>
+                                <div class="asset-content entry-content">
+
+                                    <div class="asset-body">
+                                        先日5月20日(金)に<a href="http://www.zusaar.com/event/agZ6dXNhYXJyDAsSBUV2ZW50GJJXDA" target="_blank">HBaseワークショップ(第一回)</a>が開催されました。<br /><br />HBaseについて、メインの参加者間での情報交換を中心としたディスカッションを行いました。<br />周りの方々からも質問等があればいつでも声をかけていただき、話をふくらませていくスタイルでした。<br />このような会に参加させていただいたことを、心より感謝いたします。<br /><br />今回はこの勉強会の当日に、発言しておけばよかった、言葉足らずだった、後で思ったこと等をまとめておこうと思います。<br /><br />
+                                    </div>
+
+
+                                    <div id="more" class="asset-more">
+                                        <h2>何に使っている・使いたいのか？</h2>Twitter Streamingからのデータの取り込みをしています。<br /><br />素人ながら、統計解析、機械学習や自然言語処理などの分野を勉強しようと思っていて、そのためのデータ収集をしています。<br />そのための基盤をHadoop MapReduceでやろうと思ったので、連携のしやすいHBaseを選択しました。<br /><br />現状ではデータ収集を安定して行えるような施策をしたり、次の集計などをうまく行うためのいろいろな設計を試しているところです。<br /><br /><h2>キーの設計</h2>HBaseをうまく使うためには、キーの設計は非常に大きなウェイトを占めます。<br />これまでTwitter Streamingの件でいろいろ試してみて思ったところは次のようなパターンです。<br /><br /><h3>画面等から参照する必要がある場合はPrefixで局所化</h3>WebUIなどの画面からデータ参照をするのであれば、参照する単位で局所化します。<br /><br />例えばTwitterであれば、基本的に各ユーザーのツイートを一覧で参照することになりますので、ユーザーIDをキーのPrefixとし、ステータスID(の逆順)もしくはタイムスタンプ(の逆順)をその後に置けば、各ユーザーのツイートを局所化して持つことができます。<br />場合によっては、2個目、3個目のPrefixを追加します。<br /><br />このようにすると、キー範囲指定のScanを使えるようになるので高速にデータにアクセスすることができます。<br /><br />注）「逆順」は、例えばLong.MAX_VALUEから引き算するなどした値を利用します。<br /><br /><h3>MapReduceの入力に使うならひたすら分散</h3>局所化の必要がなく、MapReduceの入力データとして利用するのであれば、ひたすら分散させます。<br />データを一意に特定できる何か、をハッシュしたりすると充分に分散できます。<br /><br />データ量が多くなることが予め分かっているのであれば、テーブル作成時にリージョン分割をすることをおすすめします。<br />キーにハッシュを利用するのであれば000・・・からfff・・・までの範囲に均等に配置されることが期待できるので、割り当て可能なMap数分程度に分割しておけばMapを適度に分散して処理することができます。<br /><br />
+<h3>特殊な場合<br /></h3>HBaseは、時系列、連番をキーとして扱うことが苦手なことが分かっています。<br /><br />キーが単調増加、もしくは単調減少すると、一番下、もしくは一番上のリージョンに書き込み負荷が集中することになります。<br /><br />1つのリージョンで充分に処理できる程度しか書き込みがない場合で、どうしても時間範囲、連番の範囲でScanする必要がある場合を除いては採用しないほうがいいと思います。<br /><br /><a href="https://github.com/sematext/HBaseWD" target="_blank">HBaseWD</a><br /><br />やむを得ず、かつ書き込みを多少でも分散したい、という場合には、<a href="https://github.com/sematext/HBaseWD" target="_blank">HBaseWD</a>というライブラリが利用できます。<br />これは、各キーにPrefixを付けてくれるライブラリです。<br /><br />例えば[0-f]をPrefixとして、順繰り、ランダム、などで付け、書き込み負荷を16個に分散します。<br />Scanの時には[0-f]のPrefixをつけた16個のScanを行います。<br /><br />良くも悪くもPrefixに利用する値の種類しか分散しませんので、他にいい方法があればそちらを採用すべきだと思います。<br /><br /><h2>カラムファミリーの使い方</h2><h3>論理的分類</h3>基本的には論理的分類によってカラムファミリーをわけます。<br />Twitter取り込みの最新の実装では status、user、place、user_mentions、urls、hashtags、delete となっています。<br /><br />論理的分類で分けるだけでも、それなりにアクセスパターンも分類できている印象です。<br /><br /><h3>tall table vs <strike>fat</strike> wide table</h3>tall table(縦長テーブル) vs <strike>fat</strike> wide table(横長テーブル) の議論がHBaseのMLでよく行われています。<br /><br />tall tableは、RDBのテーブルのように、ほぼ同じカラム数で行数が増えていく(縦に伸びる)テーブルで、<strike>fat</strike> wide tableは、qualifierを利用することで、カラム数が増えていく(横に伸びる)テーブルです。<br /><br />実は、初期のTwitter Streaming取り込みの実装では<strike>fat</strike> wide table方式を採用していました。<br />具体的には、キーにユーザーIDで、カラムファミリーstatusに対してqualifierにステータスIDを指定して、そのユーザーのツイートを同じ行内で横に入れていました。<br /><br /><strike>fat</strike> wide tableの利点は、1つのキーが指定出来れば、紐づくデータを一括で取れるところです。なので、キーの並びを気にせず、自由に分散することができます。(データの偏りは発生します)<br /><br />HBaseを使ったMapReduceへの入力は、キー毎にmapへ入力されます。<br /><strike>fat</strike> wide tableを使うと、mapに同じキーに紐づくデータを一気に投入できるので、reduceで行うような処理をmapで行うことができることがあります。<br />予めshuffleの結果と同等のテーブル設計にしておくと、多段に及ぶMapReduce処理の分岐、合流地点の受け皿としてかなり有用です。<br /><br />大きな問題点は、行の肥大化です。<br />特定の行が太りすぎてしまっても、その行が複数のリージョンに分割されることはありません。<br />また、mapへの入力時にメモリの問題にもなりかねません。<br /><br /><strike>fat</strike> wide tableはとても有用ですが、利用の際にはそのあたりの見積りも必要となります。<br /><br />（修正 2011/06/05: "fat table"という表現はあまり使われていないようなので、wide tableに改めました。）<br />（訂正 2011/06/14: "fat table"は、セルに大きなデータを持つようなテーブルのことを指すようです。大変失礼しました。）<br /><br /><h2>思うこと</h2>貧乏性な発想では、うまくいかない場合が多い。<br />元々大規模向けに作られているので、そのように発想の転換が必要。<br />（とかいうと個人でやってる身としてはツライですが。。。）<br /><br /><h2>おまけ</h2>雑談、飲み会の時に個人的にヒットした発言。<br /><br /><a href="http://twitter.com/ashigeru" target="_blank">@ashigeru</a>さん: 「データのダム」 -&gt; 「最悪テーブルごと入れ替える」<br /><a href="http://twitter.com/doryokujin" target="_blank">@doryokujin</a>さん: 「どこもがんばってるんですね。」<br /><br /><h2>反省</h2>もっと積極的に発言を。<br />話題提供のためにも、説明をスムーズにするためにも、資料を作っていく。<br /><br />というわけで、次回は6月16日(木)を予定しています。<br />またよろしくお願いします！<br /><br /><a target="_blank" title="yfrog.com - Image And Video Hosting" href="http://yfrog.com/h61tahej"><img src="http://a.yfrog.com/img618/6782/1tahe.jpg" border="0" /></a><br />
+                                    </div>
+
+                                </div>
+                                <div class="asset-footer">
+
+    
+                                    <div class="entry-categories">
+                                        <h4>カテゴリ<span class="delimiter">:</span></h4>
+                                        <ul>
+                                            <li class="entry-category"><a href="http://happy-camper.st/lang/java/hbase/workshop/" rel="tag">勉強会</a></li>
+                                        </ul>
+                                    </div>
+    
+
+
+                                    <div class="asset-meta">
+                                      <div id="twitter-share-button">
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="vertical" data-text="HBaseワークショップ(第一回) - Happy-Camper Street" data-lang="ja">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                    
+                    
+
+
+                        </div>
+                    </div>
+
+
+                    <div id="beta">
+    <div id="beta-inner">
+
+
+    
+    <div class="widget-twittericon widget">
+    <h3 class="widget-header">Twitter Icon</h3>
+    <div class="widget-content">
+<a href="http://twitter.com/ueshin" title="Follow me on Twitter"><img src="http://www.twittericon.com/image/twitter228.png" alt="Twitter Icon" border="0"/></a><br />by <a href="http://www.twittericon.com" title="Twitter Backgrounds">Twitter Backgrounds</a>
+    </div>
+</div><div class="widget-adsense widget">
+    <h3 class="widget-header">AdSense</h3>
+    <div class="widget-content">
+<script type="text/javascript"><!--
+google_ad_client = "pub-8863859888091241";
+/* Happy-Camper Street */
+google_ad_slot = "8636588514";
+google_ad_width = 160;
+google_ad_height = 600;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+    </div>
+</div><div class="widget-creative-commons widget">
+   <div class="widget-content">
+      <a href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />
+      このブログは<a href="http://creativecommons.org/licenses/by/3.0/">クリエイティブ・コモンズ</a>でライセンスされています。
+   </div>
+</div>
+
+<div class="widget-powered widget">
+    <div class="widget-content">
+        <a href="http://www.sixapart.jp/movabletype/"><img src="http://happy-camper.st/mt/mt-static/images/bug-pbmt-white.png" alt="Powered by Movable Type 5.14-ja" width="120" height="75" /></a>
+    </div>
+</div>
+
+
+
+    </div>
+</div>
+
+
+
+    
+<div id="gamma">
+    <div id="gamma-inner">
+    <div class="widget-adsense widget">
+    <h3 class="widget-header">Google検索</h3>
+    <div class="widget-content">
+<style type="text/css">
+@import url(http://www.google.com/cse/api/branding.css);
+</style>
+<div class="cse-branding-bottom" style="background-color:#FFFFFF;color:#000000">
+  <div class="cse-branding-form">
+    <form action="http://www.google.co.jp" id="cse-search-box">
+      <div>
+        <input type="hidden" name="cx" value="partner-pub-8863859888091241:4091907538" />
+        <input type="hidden" name="ie" value="UTF-8" />
+        <input type="text" name="q" size="18" />
+        <input type="submit" name="sa" value="検索" />
+      </div>
+    </form>
+  </div>
+  <div class="cse-branding-logo">
+    <img src="http://www.google.com/images/poweredby_transparent/poweredby_FFFFFF.gif" alt="Google" />
+  </div>
+  <div class="cse-branding-text">
+    カスタム検索
+  </div>
+</div>
+    </div>
+</div>
+<div class="widget-calendar widget">
+    <h3 class="widget-header">2012年9月</h3>
+    <div class="widget-content">
+        <table summary="リンク付きのカレンダー">
+            <tr>
+                <th abbr="日曜日">日</th>
+                <th abbr="月曜日">月</th>
+                <th abbr="火曜日">火</th>
+                <th abbr="水曜日">水</th>
+                <th abbr="木曜日">木</th>
+                <th abbr="金曜日">金</th>
+                <th abbr="土曜日">土</th>
+            </tr>
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    1
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    2
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    3
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    4
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    5
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    6
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    7
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    8
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    9
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    10
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    11
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    12
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    13
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    14
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    15
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    16
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    17
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    18
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    19
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    20
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    21
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    22
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    23
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    24
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    25
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    26
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    27
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    28
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    29
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    30
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+            </tr>
+        
+    
+        </table>
+    </div>
+</div>
+
+<div class="widget-archive widget-archive-category widget">
+    <h3 class="widget-header">カテゴリ</h3>
+    <div class="widget-content">
+    
+        
+        <ul>
+        
+        
+            <li>言語
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/">Java (1)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hbase/">HBase (8)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hbase/workshop/">勉強会 (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hadoop/">Hadoop (14)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hadoop/pig/">Pig (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/maven2/">Maven2 (10)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/maven2/plugins/">プラグイン (5)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/guice/">Guice (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/scala/">Scala (20)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/scala/play/">Play! (6)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/ruby/">Ruby (1)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/objective-c/">Objective-C (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/books/">本 (2)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/idea/">ネタ (3)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li>開発
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/idea/development/cminst/">cminst (5)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/idea/development/siphon/">Siphon (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/trial/">お試し (5)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/trial/esoteric/">奇妙な言語 (3)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/others/">その他 (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+    </div>
+</div>
+
+
+
+
+    <div class="widget-archive-monthly widget-archive widget">
+    <h3 class="widget-header">月別 <a href="http://happy-camper.st/archives.html">アーカイブ</a></h3>
+    <div class="widget-content">
+        <ul>
+        
+            <li><a href="http://happy-camper.st/2011/09/">2011年9月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2011/05/">2011年5月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2011/01/">2011年1月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/12/">2010年12月 (4)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/11/">2010年11月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/10/">2010年10月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/09/">2010年9月 (6)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/07/">2010年7月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/06/">2010年6月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/05/">2010年5月 (5)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/04/">2010年4月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2009/03/">2009年3月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2009/01/">2009年1月 (5)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (11)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (14)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/08/">2008年8月 (1)</a></li>
+        
+        </ul>
+    </div>
+</div>
+        
+    
+
+
+
+<div class="widget-syndication widget">
+    <div class="widget-content">
+        <ul>
+            <li><img src="http://happy-camper.st/mt/mt-static/images/status_icons/feed.gif" alt="購読する" width="9" height="9" /> <a href="http://happy-camper.st/atom.xml">このブログを購読</a></li>
+
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-8145422-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+    </div>
+</div>
+
+
+
+
+                </div>
+            </div>
+
+
+            <div id="footer">
+    <div id="footer-inner">
+        <div id="footer-content">
+            <div class="widget-powered widget">
+                <div class="widget-content">
+                    Powered by <a href="http://www.sixapart.jp/movabletype/">Movable Type</a>
+                </div>
+            </div>
+
+            <div class="widget-creative-commons widget">
+                <div class="widget-content">
+                    このブログは<a href="http://creativecommons.org/licenses/by/3.0/">クリエイティブ・コモンズ</a>でライセンスされています。
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+        </div>
+    </div>
+</body>
+</html>

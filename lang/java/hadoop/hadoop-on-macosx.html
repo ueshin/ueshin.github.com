@@ -1,0 +1,1089 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" id="sixapart-standard">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="Movable Type 5.14-ja" />
+<link rel="stylesheet" href="http://happy-camper.st/styles.css" type="text/css" />
+<link rel="start" href="http://happy-camper.st/" title="Home" />
+<link rel="alternate" type="application/atom+xml" title="Recent Entries" href="http://happy-camper.st/atom.xml" />
+<script type="text/javascript" src="http://happy-camper.st/mt.js"></script>
+<!--
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="http://happy-camper.st/lang/java/hadoop/hadoop-on-macosx.html">
+<dc:title>Hadoop on MacOSX</dc:title>
+<dc:description>MacOSXにHadoopを擬似分散モードで動作できるようにインストールした時の...</dc:description>
+<dc:creator>Takuya UESHIN</dc:creator>
+<dc:date>2010-05-17T19:46:30+09:00</dc:date>
+<license rdf:resource="http://creativecommons.org/licenses/by/3.0/" />
+</Work>
+<License rdf:about="http://creativecommons.org/licenses/by/3.0/">
+</License>
+</rdf:RDF>
+-->
+
+
+    
+    <link rel="prev bookmark" href="http://happy-camper.st/lang/scala/twitter-streaming-api.html" title="Scalaで Twitter ストリーミングAPI" />
+    <link rel="next bookmark" href="http://happy-camper.st/lang/java/hadoop/pseudo-distributed-test.html" title="擬似分散モードの動作確認" />
+    
+    
+    <title>Hadoop on MacOSX - Happy-Camper Street</title>
+</head>
+<body id="classic-blog" class="mt-entry-archive layout-wtt">
+    <div id="container">
+        <div id="container-inner">
+
+
+            <div id="header">
+    <div id="header-inner">
+        <div id="header-content">
+
+
+            <div id="header-name"><a href="http://happy-camper.st/" accesskey="1">Happy-Camper Street</a></div>
+            <div id="header-description">とあるフリープログラマの頭ん中。</div>
+
+        </div>
+    </div>
+</div>
+
+
+
+            <div id="content">
+                <div id="content-inner">
+
+
+                    <div id="alpha">
+                        <div id="alpha-inner">
+
+
+                            <div id="entry-38" class="entry-asset asset hentry">
+                                <div class="asset-header">
+                                    <h1 id="page-title" class="asset-name entry-title">Hadoop on MacOSX</h1>
+                                    <div class="asset-meta">
+                                        <span class="byline">
+
+                                            <span class="vcard author"><a class="fn url" href="http://happy-camper.st">Takuya UESHIN</a></span> (<abbr class="published" title="2010-05-17T19:46:30+09:00">2010年5月17日 19:46</abbr>)
+
+                                        </span>
+
+
+                                        <span class="separator">|</span> <a href="http://happy-camper.st/lang/java/hadoop/hadoop-on-macosx.html#trackbacks">トラックバック(2)</a>
+
+                                    </div>
+                                </div>
+                                <div class="asset-content entry-content">
+
+                                    <div class="asset-body">
+                                        MacOSXに<a href="http://hadoop.apache.org/" target="_blank">Hadoop</a>を擬似分散モードで動作できるようにインストールした時の記録です。<br /><br />利用した環境は次の通りです。<br /><br /><ul><li>MacOSX Snow Leopard</li><li>Hadoop 0.20.2</li></ul><br />また、参考にしたページは次のページです。<br /><br /><ul><li><a href="http://blog.ibd.com/scalable-deployment/hadoop-hdfs-and-hbase-on-ubuntu/comment-page-1/" target="_blank">Hadoop, HDFS and Hbase on Ubuntu &amp; Macintosh Leopard</a></li><li><a href="http://blog.ibd.com/scalable-deployment/hbase-hadoop-on-mac-ox-x/" target="_blank">HBase/Hadoop on Mac OS X</a></li></ul>このページには<a href="http://hadoop.apache.org/hbase/" target="_blank">HBase</a>のインストールまで記載されていますが、まだそこまでやっていないので、機会があればということで。<br /><br />
+                                    </div>
+
+
+                                    <div id="more" class="asset-more">
+                                        <h2>ダウンロード</h2><a href="http://hadoop.apache.org/" target="_blank"></a><a href="http://www.apache.org/dyn/closer.cgi/hadoop/core/" target="_blank">ダウンロードページ</a>から、適当なミラーサイトを選んでダウンロード。<br />/usr/local に展開します。<br /><br /><pre><code>$ pwd
+/usr/local
+$ sudo tar zxvf /path/to/hadoop-0.20.2.tar.gz
+$ sudo ln -s hadoop-0.20.2 hadoop</code></pre><br />以降、このインストールディレクトリを <code>\${HADOOP_HOME}</code> と記述します。<br /><br /><h2>sshd</h2>Hadoopを擬似分散モードで起動するには、sshdが必要です。<br />※正確には、必ずしも必要ではありませんが、あった方が便利です。<br /><br />「システム環境設定」から、「共有」の「リモートログイン」を有効にすればsshdが起動します。<br />擬似分散モードではローカルホストからしかアクセスしないので、ファイアウォールは有効にしておいても大丈夫です。<br /><br /><h2><code>hadoop</code>ユーザー作成</h2>Hadoopの各サーバーを起動するための実行ユーザー <code>hadoop</code> を作成します。<br /><br /><h3><code>hadoop</code>ユーザー向けのグループIDとユーザーIDを決める</h3>利用中のグループIDを調べる<br /><br /><pre><code>$ sudo dscl . -list /Groups PrimaryGroupID | cut -c 32-38 | sort -rn</code></pre><br />利用中のユーザーIDを調べる<br /><br /><pre><code>$ sudo dscl . -list /Users UniqueID | cut -c 23-28 | sort -rn</code></pre><br />※ <code>cut</code> の範囲がずれている場合があるので、適宜調節してください。<br /><br />それぞれ出てきたIDと被らないIDを選びます。<br />僕の環境では300番が空いていたので、以降、グループID/ユーザーIDを300とします。<br /><br /><h3>ユーザー作成</h3><code>hadoop</code>グループと<code>hadoop</code>ユーザーを作っていきます。<br /><br /><pre><code>$ sudo dscl . -create /Groups/_hadoop PrimaryGroupID 300
+$ sudo dscl . -append /Groups/_hadoop RecordName hadoop</code></pre><br /><pre><code>$ sudo dscl . -create /Users/_hadoop UniqueID 300
+$ sudo dscl . -create /Users/_hadoop RealName "Hadoop Service"
+$ sudo dscl . -create /Users/_hadoop PrimaryGroupID 300
+$ sudo dscl . -create /Users/_hadoop NFSHomeDirectory /var/lib/hadoop
+$ sudo dscl . -create /Users/_hadoop Password "*"
+$ sudo dscl . -append /Users/_hadoop RecordName hadoop
+
+$ sudo /usr/sbin/createhomedir -b -u hadoop</code></pre><br /><code>hadoop</code>ユーザーのホームディレクトリ( <code>/var/lib/hadoop</code> )にデータを入れるよう設定していきます。<br />環境に合わせて変更してください。<br /><br /><h3>パスなし認証設定</h3>ローカルホストにパスワードなしでsshログインできるように、パスフレーズなし鍵認証の設定を行います。<br /><br /><pre><code>$ sudo su - hadoop
+$ ssh-keygen
+$ cd .ssh
+$ cat id_rsa.pub &gt;&gt; authorized_keys</code></pre><br />※ 鍵の取り扱いには要注意です！<br /><br />ログインできるか確認します。<br /><br /><h2>Hadoop設定</h2>設定するファイルは<code>hadoop-env.sh</code>、<code>core-site.xml</code>、<code>hdfs-site.xml</code>、<code>mapred-site.xml</code>の4つです。<br /><br /><code>\${HADOOP_HOME}/conf</code> 以下に設置します。<br /><br /><h3>hadoop-env.sh</h3><code>JAVA_HOME</code>と、後で<code>MapReduce</code>で<code>Scala</code>を使いたいので、<code>HADOOP_CLASSPATH</code>の設定をしておきます。<br /><br /><pre><code>export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home
+export HADOOP_CLASSPATH=/opt/local/share/scala-2.8/lib/scala-library.jar</code></pre><br />その他はデフォルトのままにしておきます。<br /><br /><h3><code>core-site.xml</code></h3>詳しい説明とそのデフォルト値は <a href="http://hadoop.apache.org/common/docs/current/core-default.html" target="_blank"><code>core-default.xml</code></a> を参照してください。<br /><br /><pre><code>&lt;?xml version="1.0"?&gt;
+&lt;?xml-stylesheet type="text/xsl" href="configuration.xsl"?&gt;
+
+&lt;!-- Put site-specific property overrides in this file. --&gt;
+
+&lt;configuration&gt;
+
+  &lt;property&gt;
+    &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;
+    &lt;value&gt;/var/lib/hadoop&lt;/value&gt;
+  &lt;/property&gt;
+
+  &lt;property&gt;
+    &lt;name&gt;fs.default.name&lt;/name&gt;
+    &lt;value&gt;hdfs://localhost:9000&lt;/value&gt;
+  &lt;/property&gt;
+
+&lt;/configuration&gt;</code></pre><br /><h3><code>hdfs-site.xml</code></h3>詳しい説明とそのデフォルト値は <a href="http://hadoop.apache.org/common/docs/current/hdfs-default.html" target="_blank"><code>hdfs-default.xml</code></a> を参照してください。<br /><br /><pre><code>&lt;?xml version="1.0"?&gt;
+&lt;?xml-stylesheet type="text/xsl" href="configuration.xsl"?&gt;
+
+&lt;!-- Put site-specific property overrides in this file. --&gt;
+
+&lt;configuration&gt;
+
+  &lt;property&gt;
+    &lt;name&gt;dfs.replication&lt;/name&gt;
+    &lt;value&gt;1&lt;/value&gt;
+  &lt;/property&gt;
+
+&lt;/configuration&gt;</code></pre><br /><h3><code>mapred-site.xml</code></h3>詳しい説明とそのデフォルト値は <a href="http://hadoop.apache.org/common/docs/current/mapred-default.html" target="_blank"><code>mapred-default.xml</code></a> を参照してください。<br /><br /><pre><code>&lt;?xml version="1.0"?&gt;
+&lt;?xml-stylesheet type="text/xsl" href="configuration.xsl"?&gt;
+
+&lt;!-- Put site-specific property overrides in this file. --&gt;
+
+&lt;configuration&gt;
+
+  &lt;property&gt;
+    &lt;name&gt;mapred.job.tracker&lt;/name&gt;
+    &lt;value&gt;localhost:9001&lt;/value&gt;
+  &lt;/property&gt;
+
+&lt;/configuration&gt;</code></pre><br /><h3>ログディレクトリ</h3><code>\${HADOOP_HOME}/logs</code>がない場合には作成しておきます。<br /><br /><pre><code>$ sudo mkdir \${HADOOP_HOME}/logs
+$ sudo chown hadoop:hadoop \${HADOOP_HOME}/logs</code></pre><br /><h2><code>NameNode</code>のフォーマット</h2>初めてHadoopを起動する前に、<code>NameNode</code>をフォーマットします。<br /><br /><pre><code>$ sudo su - hadoop
+$ \${HADOOP_HOME}/bin/hadoop namenode -format</code></pre><br /><h2>Hadoop起動</h2><code>hadoop</code>ユーザーでHadoopを起動します。<br /><br /><pre><code>$ sudo su - hadoop
+$ \${HADOOP_HOME}/bin/start-all.sh</code></pre><br />これで無事に起動しました。<br /><br /><h3>ユーザーディレクトリ作成</h3>上記の設定では、<a href="http://hadoop.apache.org/common/docs/r0.20.2/hdfs_permissions_guide.html" target="_blank">パーミッション</a>が有効になっているため、各ユーザーの作業用には別途ディレクトリを作成する必要があります。<br /><br />例） ueshinユーザー用<br /><br /><pre><code>$ sudo su - hadoop
+$ \${HADOOP_HOME}/bin/hadoop fs -mkdir /user/ueshin
+$ \${HADOOP_HOME}/bin/hadoop fs -chown ueshin:staff /user/ueshin</code></pre><br />これで、ueshinユーザーは自由にHDFS上のファイルを操作することができるようになります。<br /><br /><pre><code>ueshin$ \${HADOOP_HOME}/bin/hadoop fs -mkdir input
+ueshin$ \${HADOOP_HOME}/bin/hadoop fs -put \${HADOOP_HOME}/conf/*.xml input
+ueshin$ \${HADOOP_HOME}/bin/hadoop fs -ls
+ueshin$ \${HADOOP_HOME}/bin/hadoop fs -ls input
+ueshin$ \${HADOOP_HOME}/bin/hadoop fs -cat input/core-site.xml</code></pre><br />
+                                    </div>
+
+                                </div>
+                                <div class="asset-footer">
+
+    
+                                    <div class="entry-categories">
+                                        <h4>カテゴリ<span class="delimiter">:</span></h4>
+                                        <ul>
+                                            <li class="entry-category"><a href="http://happy-camper.st/lang/java/hadoop/" rel="tag">Hadoop</a></li>
+                                        </ul>
+                                    </div>
+    
+
+
+                                    <div class="asset-meta">
+                                      <div id="twitter-share-button">
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="vertical" data-text="Hadoop on MacOSX - Happy-Camper Street" data-lang="ja">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                    <div id="trackbacks" class="trackbacks">
+    <h2 class="trackbacks-header">トラックバック(2)</h2>
+
+    
+    
+
+
+    
+    
+        
+    <div class="trackbacks-content">
+        
+        <div class="trackback" id="ping-32">
+            <div class="inner">
+                <div class="trackback-header">
+                    <div class="asset-meta">
+                        Happy-Camper Street - <a href="http://happy-camper.st/lang/java/hadoop/pseudo-distributed-test.html" rel="nofollow">擬似分散モードの動作確認</a> (<a href="#ping-32" rel="nofollow">2010年5月20日 21:39</a>)
+                    </div>
+                </div>
+                <div class="trackback-content">
+                    <p>
+                        先日セットアップした擬似分散モードの動作確認を行います。テストに使うサンプルはい... <a href="http://happy-camper.st/lang/java/hadoop/pseudo-distributed-test.html" rel="nofollow">続きを読む</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+    
+        
+        <div class="trackback" id="ping-33">
+            <div class="inner">
+                <div class="trackback-header">
+                    <div class="asset-meta">
+                        Happy-Camper Street - <a href="http://happy-camper.st/lang/java/hbase/hbase-on-macosx.html" rel="nofollow">HBase on MacOSX</a> (<a href="#ping-33" rel="nofollow">2010年6月29日 20:55</a>)
+                    </div>
+                </div>
+                <div class="trackback-content">
+                    <p>
+                        MacOSXにHBaseをインストールした時の記録です。利用した環境は以下の通り... <a href="http://happy-camper.st/lang/java/hbase/hbase-on-macosx.html" rel="nofollow">続きを読む</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+        
+    
+</div>
+
+
+                    
+
+
+                        </div>
+                    </div>
+
+
+                    <div id="beta">
+    <div id="beta-inner">
+
+
+    
+    <div class="widget-twittericon widget">
+    <h3 class="widget-header">Twitter Icon</h3>
+    <div class="widget-content">
+<a href="http://twitter.com/ueshin" title="Follow me on Twitter"><img src="http://www.twittericon.com/image/twitter228.png" alt="Twitter Icon" border="0"/></a><br />by <a href="http://www.twittericon.com" title="Twitter Backgrounds">Twitter Backgrounds</a>
+    </div>
+</div><div class="widget-adsense widget">
+    <h3 class="widget-header">AdSense</h3>
+    <div class="widget-content">
+<script type="text/javascript"><!--
+google_ad_client = "pub-8863859888091241";
+/* Happy-Camper Street */
+google_ad_slot = "8636588514";
+google_ad_width = 160;
+google_ad_height = 600;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+    </div>
+</div><div class="widget-creative-commons widget">
+   <div class="widget-content">
+      <a href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />
+      このブログは<a href="http://creativecommons.org/licenses/by/3.0/">クリエイティブ・コモンズ</a>でライセンスされています。
+   </div>
+</div>
+
+<div class="widget-powered widget">
+    <div class="widget-content">
+        <a href="http://www.sixapart.jp/movabletype/"><img src="http://happy-camper.st/mt/mt-static/images/bug-pbmt-white.png" alt="Powered by Movable Type 5.14-ja" width="120" height="75" /></a>
+    </div>
+</div>
+
+
+
+    </div>
+</div>
+
+
+
+    
+<div id="gamma">
+    <div id="gamma-inner">
+    <div class="widget-adsense widget">
+    <h3 class="widget-header">Google検索</h3>
+    <div class="widget-content">
+<style type="text/css">
+@import url(http://www.google.com/cse/api/branding.css);
+</style>
+<div class="cse-branding-bottom" style="background-color:#FFFFFF;color:#000000">
+  <div class="cse-branding-form">
+    <form action="http://www.google.co.jp" id="cse-search-box">
+      <div>
+        <input type="hidden" name="cx" value="partner-pub-8863859888091241:4091907538" />
+        <input type="hidden" name="ie" value="UTF-8" />
+        <input type="text" name="q" size="18" />
+        <input type="submit" name="sa" value="検索" />
+      </div>
+    </form>
+  </div>
+  <div class="cse-branding-logo">
+    <img src="http://www.google.com/images/poweredby_transparent/poweredby_FFFFFF.gif" alt="Google" />
+  </div>
+  <div class="cse-branding-text">
+    カスタム検索
+  </div>
+</div>
+    </div>
+</div>
+<div class="widget-calendar widget">
+    <h3 class="widget-header">2012年9月</h3>
+    <div class="widget-content">
+        <table summary="リンク付きのカレンダー">
+            <tr>
+                <th abbr="日曜日">日</th>
+                <th abbr="月曜日">月</th>
+                <th abbr="火曜日">火</th>
+                <th abbr="水曜日">水</th>
+                <th abbr="木曜日">木</th>
+                <th abbr="金曜日">金</th>
+                <th abbr="土曜日">土</th>
+            </tr>
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    1
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    2
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    3
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    4
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    5
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    6
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    7
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    8
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    9
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    10
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    11
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    12
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    13
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    14
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    15
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    16
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    17
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    18
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    19
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    20
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    21
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    22
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    23
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    24
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    25
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    26
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    27
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    28
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+                    29
+        
+        
+                </td>
+        
+            </tr>
+        
+    
+        
+            <tr>
+        
+                <td>
+        
+        
+                    30
+        
+        
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+    
+        
+                <td>
+        
+        
+        &nbsp;
+                </td>
+        
+            </tr>
+        
+    
+        </table>
+    </div>
+</div>
+
+<div class="widget-archive widget-archive-category widget">
+    <h3 class="widget-header">カテゴリ</h3>
+    <div class="widget-content">
+    
+        
+        <ul>
+        
+        
+            <li>言語
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/">Java (1)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hbase/">HBase (8)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hbase/workshop/">勉強会 (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hadoop/">Hadoop (14)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/hadoop/pig/">Pig (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/maven2/">Maven2 (10)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/maven2/plugins/">プラグイン (5)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/java/guice/">Guice (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/scala/">Scala (20)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/lang/scala/play/">Play! (6)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/ruby/">Ruby (1)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/lang/objective-c/">Objective-C (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/books/">本 (2)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/idea/">ネタ (3)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li>開発
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/idea/development/cminst/">cminst (5)</a>
+        
+        
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/idea/development/siphon/">Siphon (2)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/trial/">お試し (5)</a>
+        
+        
+        
+        <ul>
+        
+        
+            <li><a href="http://happy-camper.st/trial/esoteric/">奇妙な言語 (3)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+            </li>
+        
+    
+        
+        
+            <li><a href="http://happy-camper.st/others/">その他 (1)</a>
+        
+        
+            </li>
+        
+        </ul>
+        
+    
+    </div>
+</div>
+
+
+
+
+    <div class="widget-archive-monthly widget-archive widget">
+    <h3 class="widget-header">月別 <a href="http://happy-camper.st/archives.html">アーカイブ</a></h3>
+    <div class="widget-content">
+        <ul>
+        
+            <li><a href="http://happy-camper.st/2011/09/">2011年9月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2011/05/">2011年5月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2011/01/">2011年1月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/12/">2010年12月 (4)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/11/">2010年11月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/10/">2010年10月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/09/">2010年9月 (6)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/07/">2010年7月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/06/">2010年6月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/05/">2010年5月 (5)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2010/04/">2010年4月 (2)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2009/03/">2009年3月 (1)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2009/01/">2009年1月 (5)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (11)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (14)</a></li>
+        
+    
+        
+            <li><a href="http://happy-camper.st/2008/08/">2008年8月 (1)</a></li>
+        
+        </ul>
+    </div>
+</div>
+        
+    
+
+
+
+<div class="widget-syndication widget">
+    <div class="widget-content">
+        <ul>
+            <li><img src="http://happy-camper.st/mt/mt-static/images/status_icons/feed.gif" alt="購読する" width="9" height="9" /> <a href="http://happy-camper.st/atom.xml">このブログを購読</a></li>
+
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-8145422-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+    </div>
+</div>
+
+
+
+
+                </div>
+            </div>
+
+
+            <div id="footer">
+    <div id="footer-inner">
+        <div id="footer-content">
+            <div class="widget-powered widget">
+                <div class="widget-content">
+                    Powered by <a href="http://www.sixapart.jp/movabletype/">Movable Type</a>
+                </div>
+            </div>
+
+            <div class="widget-creative-commons widget">
+                <div class="widget-content">
+                    このブログは<a href="http://creativecommons.org/licenses/by/3.0/">クリエイティブ・コモンズ</a>でライセンスされています。
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+        </div>
+    </div>
+</body>
+</html>
