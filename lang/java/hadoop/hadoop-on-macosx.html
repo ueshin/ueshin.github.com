@@ -107,7 +107,7 @@
                                         <h2>ダウンロード</h2><a href="http://hadoop.apache.org/" target="_blank"></a><a href="http://www.apache.org/dyn/closer.cgi/hadoop/core/" target="_blank">ダウンロードページ</a>から、適当なミラーサイトを選んでダウンロード。<br />/usr/local に展開します。<br /><br /><pre><code>$ pwd
 /usr/local
 $ sudo tar zxvf /path/to/hadoop-0.20.2.tar.gz
-$ sudo ln -s hadoop-0.20.2 hadoop</code></pre><br />以降、このインストールディレクトリを <code>\${HADOOP_HOME}</code> と記述します。<br /><br /><h2>sshd</h2>Hadoopを擬似分散モードで起動するには、sshdが必要です。<br />※正確には、必ずしも必要ではありませんが、あった方が便利です。<br /><br />「システム環境設定」から、「共有」の「リモートログイン」を有効にすればsshdが起動します。<br />擬似分散モードではローカルホストからしかアクセスしないので、ファイアウォールは有効にしておいても大丈夫です。<br /><br /><h2><code>hadoop</code>ユーザー作成</h2>Hadoopの各サーバーを起動するための実行ユーザー <code>hadoop</code> を作成します。<br /><br /><h3><code>hadoop</code>ユーザー向けのグループIDとユーザーIDを決める</h3>利用中のグループIDを調べる<br /><br /><pre><code>$ sudo dscl . -list /Groups PrimaryGroupID | cut -c 32-38 | sort -rn</code></pre><br />利用中のユーザーIDを調べる<br /><br /><pre><code>$ sudo dscl . -list /Users UniqueID | cut -c 23-28 | sort -rn</code></pre><br />※ <code>cut</code> の範囲がずれている場合があるので、適宜調節してください。<br /><br />それぞれ出てきたIDと被らないIDを選びます。<br />僕の環境では300番が空いていたので、以降、グループID/ユーザーIDを300とします。<br /><br /><h3>ユーザー作成</h3><code>hadoop</code>グループと<code>hadoop</code>ユーザーを作っていきます。<br /><br /><pre><code>$ sudo dscl . -create /Groups/_hadoop PrimaryGroupID 300
+$ sudo ln -s hadoop-0.20.2 hadoop</code></pre><br />以降、このインストールディレクトリを <code>${HADOOP_HOME}</code> と記述します。<br /><br /><h2>sshd</h2>Hadoopを擬似分散モードで起動するには、sshdが必要です。<br />※正確には、必ずしも必要ではありませんが、あった方が便利です。<br /><br />「システム環境設定」から、「共有」の「リモートログイン」を有効にすればsshdが起動します。<br />擬似分散モードではローカルホストからしかアクセスしないので、ファイアウォールは有効にしておいても大丈夫です。<br /><br /><h2><code>hadoop</code>ユーザー作成</h2>Hadoopの各サーバーを起動するための実行ユーザー <code>hadoop</code> を作成します。<br /><br /><h3><code>hadoop</code>ユーザー向けのグループIDとユーザーIDを決める</h3>利用中のグループIDを調べる<br /><br /><pre><code>$ sudo dscl . -list /Groups PrimaryGroupID | cut -c 32-38 | sort -rn</code></pre><br />利用中のユーザーIDを調べる<br /><br /><pre><code>$ sudo dscl . -list /Users UniqueID | cut -c 23-28 | sort -rn</code></pre><br />※ <code>cut</code> の範囲がずれている場合があるので、適宜調節してください。<br /><br />それぞれ出てきたIDと被らないIDを選びます。<br />僕の環境では300番が空いていたので、以降、グループID/ユーザーIDを300とします。<br /><br /><h3>ユーザー作成</h3><code>hadoop</code>グループと<code>hadoop</code>ユーザーを作っていきます。<br /><br /><pre><code>$ sudo dscl . -create /Groups/_hadoop PrimaryGroupID 300
 $ sudo dscl . -append /Groups/_hadoop RecordName hadoop</code></pre><br /><pre><code>$ sudo dscl . -create /Users/_hadoop UniqueID 300
 $ sudo dscl . -create /Users/_hadoop RealName "Hadoop Service"
 $ sudo dscl . -create /Users/_hadoop PrimaryGroupID 300
@@ -118,7 +118,7 @@ $ sudo dscl . -append /Users/_hadoop RecordName hadoop
 $ sudo /usr/sbin/createhomedir -b -u hadoop</code></pre><br /><code>hadoop</code>ユーザーのホームディレクトリ( <code>/var/lib/hadoop</code> )にデータを入れるよう設定していきます。<br />環境に合わせて変更してください。<br /><br /><h3>パスなし認証設定</h3>ローカルホストにパスワードなしでsshログインできるように、パスフレーズなし鍵認証の設定を行います。<br /><br /><pre><code>$ sudo su - hadoop
 $ ssh-keygen
 $ cd .ssh
-$ cat id_rsa.pub &gt;&gt; authorized_keys</code></pre><br />※ 鍵の取り扱いには要注意です！<br /><br />ログインできるか確認します。<br /><br /><h2>Hadoop設定</h2>設定するファイルは<code>hadoop-env.sh</code>、<code>core-site.xml</code>、<code>hdfs-site.xml</code>、<code>mapred-site.xml</code>の4つです。<br /><br /><code>\${HADOOP_HOME}/conf</code> 以下に設置します。<br /><br /><h3>hadoop-env.sh</h3><code>JAVA_HOME</code>と、後で<code>MapReduce</code>で<code>Scala</code>を使いたいので、<code>HADOOP_CLASSPATH</code>の設定をしておきます。<br /><br /><pre><code>export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home
+$ cat id_rsa.pub &gt;&gt; authorized_keys</code></pre><br />※ 鍵の取り扱いには要注意です！<br /><br />ログインできるか確認します。<br /><br /><h2>Hadoop設定</h2>設定するファイルは<code>hadoop-env.sh</code>、<code>core-site.xml</code>、<code>hdfs-site.xml</code>、<code>mapred-site.xml</code>の4つです。<br /><br /><code>${HADOOP_HOME}/conf</code> 以下に設置します。<br /><br /><h3>hadoop-env.sh</h3><code>JAVA_HOME</code>と、後で<code>MapReduce</code>で<code>Scala</code>を使いたいので、<code>HADOOP_CLASSPATH</code>の設定をしておきます。<br /><br /><pre><code>export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home
 export HADOOP_CLASSPATH=/opt/local/share/scala-2.8/lib/scala-library.jar</code></pre><br />その他はデフォルトのままにしておきます。<br /><br /><h3><code>core-site.xml</code></h3>詳しい説明とそのデフォルト値は <a href="http://hadoop.apache.org/common/docs/current/core-default.html" target="_blank"><code>core-default.xml</code></a> を参照してください。<br /><br /><pre><code>&lt;?xml version="1.0"?&gt;
 &lt;?xml-stylesheet type="text/xsl" href="configuration.xsl"?&gt;
 
@@ -160,16 +160,16 @@ export HADOOP_CLASSPATH=/opt/local/share/scala-2.8/lib/scala-library.jar</code><
     &lt;value&gt;localhost:9001&lt;/value&gt;
   &lt;/property&gt;
 
-&lt;/configuration&gt;</code></pre><br /><h3>ログディレクトリ</h3><code>\${HADOOP_HOME}/logs</code>がない場合には作成しておきます。<br /><br /><pre><code>$ sudo mkdir \${HADOOP_HOME}/logs
-$ sudo chown hadoop:hadoop \${HADOOP_HOME}/logs</code></pre><br /><h2><code>NameNode</code>のフォーマット</h2>初めてHadoopを起動する前に、<code>NameNode</code>をフォーマットします。<br /><br /><pre><code>$ sudo su - hadoop
-$ \${HADOOP_HOME}/bin/hadoop namenode -format</code></pre><br /><h2>Hadoop起動</h2><code>hadoop</code>ユーザーでHadoopを起動します。<br /><br /><pre><code>$ sudo su - hadoop
-$ \${HADOOP_HOME}/bin/start-all.sh</code></pre><br />これで無事に起動しました。<br /><br /><h3>ユーザーディレクトリ作成</h3>上記の設定では、<a href="http://hadoop.apache.org/common/docs/r0.20.2/hdfs_permissions_guide.html" target="_blank">パーミッション</a>が有効になっているため、各ユーザーの作業用には別途ディレクトリを作成する必要があります。<br /><br />例） ueshinユーザー用<br /><br /><pre><code>$ sudo su - hadoop
-$ \${HADOOP_HOME}/bin/hadoop fs -mkdir /user/ueshin
-$ \${HADOOP_HOME}/bin/hadoop fs -chown ueshin:staff /user/ueshin</code></pre><br />これで、ueshinユーザーは自由にHDFS上のファイルを操作することができるようになります。<br /><br /><pre><code>ueshin$ \${HADOOP_HOME}/bin/hadoop fs -mkdir input
-ueshin$ \${HADOOP_HOME}/bin/hadoop fs -put \${HADOOP_HOME}/conf/*.xml input
-ueshin$ \${HADOOP_HOME}/bin/hadoop fs -ls
-ueshin$ \${HADOOP_HOME}/bin/hadoop fs -ls input
-ueshin$ \${HADOOP_HOME}/bin/hadoop fs -cat input/core-site.xml</code></pre><br />
+&lt;/configuration&gt;</code></pre><br /><h3>ログディレクトリ</h3><code>${HADOOP_HOME}/logs</code>がない場合には作成しておきます。<br /><br /><pre><code>$ sudo mkdir ${HADOOP_HOME}/logs
+$ sudo chown hadoop:hadoop ${HADOOP_HOME}/logs</code></pre><br /><h2><code>NameNode</code>のフォーマット</h2>初めてHadoopを起動する前に、<code>NameNode</code>をフォーマットします。<br /><br /><pre><code>$ sudo su - hadoop
+$ ${HADOOP_HOME}/bin/hadoop namenode -format</code></pre><br /><h2>Hadoop起動</h2><code>hadoop</code>ユーザーでHadoopを起動します。<br /><br /><pre><code>$ sudo su - hadoop
+$ ${HADOOP_HOME}/bin/start-all.sh</code></pre><br />これで無事に起動しました。<br /><br /><h3>ユーザーディレクトリ作成</h3>上記の設定では、<a href="http://hadoop.apache.org/common/docs/r0.20.2/hdfs_permissions_guide.html" target="_blank">パーミッション</a>が有効になっているため、各ユーザーの作業用には別途ディレクトリを作成する必要があります。<br /><br />例） ueshinユーザー用<br /><br /><pre><code>$ sudo su - hadoop
+$ ${HADOOP_HOME}/bin/hadoop fs -mkdir /user/ueshin
+$ ${HADOOP_HOME}/bin/hadoop fs -chown ueshin:staff /user/ueshin</code></pre><br />これで、ueshinユーザーは自由にHDFS上のファイルを操作することができるようになります。<br /><br /><pre><code>ueshin$ ${HADOOP_HOME}/bin/hadoop fs -mkdir input
+ueshin$ ${HADOOP_HOME}/bin/hadoop fs -put ${HADOOP_HOME}/conf/*.xml input
+ueshin$ ${HADOOP_HOME}/bin/hadoop fs -ls
+ueshin$ ${HADOOP_HOME}/bin/hadoop fs -ls input
+ueshin$ ${HADOOP_HOME}/bin/hadoop fs -cat input/core-site.xml</code></pre><br />
                                     </div>
 
                                 </div>

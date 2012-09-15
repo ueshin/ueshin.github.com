@@ -105,17 +105,17 @@
 
                                     <div id="more" class="asset-more">
                                         <h2>install-file / deploy-file</h2>ローカルにインストール、もしくはレポジトリにデプロイする方法です。<br /><br />個人で利用する場合にはローカルにインストールしてあればいいですし、複数人で利用する場合にはレポジトリにデプロイしておいたほうがいいでしょう。<br /><br /><h3>インストール</h3><pre><code>$ mvn install:install-file \
-    -DgroupId=\${groupId} \
-    -DartifactId=\${artifactId} \
-    -Dversion=\${version} \
+    -DgroupId=${groupId} \
+    -DartifactId=${artifactId} \
+    -Dversion=${version} \
     -Dpackaging=jar \
     -Dfile=/path/to/file.jar</code></pre><br />groupId / artifactId / version を適切に設定してください。<br /><br /><code>-Dclassifier=sources</code>を追加で指定すればソースコードのjarファイル、<code>-Dclassifier=javadoc</code>を指定すればJavaDocのjarファイルをインストールすることができます。<br /><br /><h3>デプロイ</h3><pre><code>$ mvn deploy:deploy-file \
-    -DgroupId=\${groupId} \
-    -DartifactId=\${artifactId} \
-    -Dversion=\${version} \
+    -DgroupId=${groupId} \
+    -DartifactId=${artifactId} \
+    -Dversion=${version} \
     -Dpackaging=jar \
     -Dfile=/path/to/file.jar \
-    -Durl=\${url}</code></pre><br />groupId / artifactId / version / url を適切に設定してください。<br /><br /><code>-Dclassifier=sources</code>を追加で指定すればソースコードのjarファイル、<code>-Dclassifier=javadoc</code>を指定すればJavaDocのjarファイルをデプロイすることができます。<br /><br />
+    -Durl=${url}</code></pre><br />groupId / artifactId / version / url を適切に設定してください。<br /><br /><code>-Dclassifier=sources</code>を追加で指定すればソースコードのjarファイル、<code>-Dclassifier=javadoc</code>を指定すればJavaDocのjarファイルをデプロイすることができます。<br /><br />
                                     </div>
 
                                 </div>

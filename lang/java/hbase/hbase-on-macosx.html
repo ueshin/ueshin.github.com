@@ -106,7 +106,7 @@ Leopard</a></li><li><a href="http://blog.ibd.com/scalable-deployment/hbase-hadoo
                                         <h2>ダウンロード</h2><a href="http://www.apache.org/dyn/closer.cgi/hbase/">ダウンロードページ</a>から、適当なミラーサイトを選んでダウンロードします。<br />ただし、2010/06/29現在、ミラーが行き渡っていないサーバーがあるようなので、その場合には別のミラーからダウンロードして下さい。<br /><br />/usr/local に展開します。<br /><br /><pre><code>$ pwd
 /usr/local
 $ sudo tar zxvf /path/to/hbase-0.20.5.tar.gz
-$ sudo ln -s hbase-0.20.5 hbase</code></pre><br />以降、このインストールディレクトリを <code>\${HBASE_HOME}</code> と記述します。<br />また<code>Hadoop</code>がインストールされているディレクトリを<code>\${HADOOP_HOME}</code>と記述します。<br /><br /><h2>HBase設定</h2>設定するファイルは<code>\${HBASE_HOME}/conf</code>にある、<code>hbase-env.sh</code>、<code>hbase-site.xml</code>の２つです。<br />また、<code>HBase</code>を使って<code>Hadoop</code>で<code>MapReduce</code>するには、<code>\${HADOOP_HOME}/conf/hadoop-env.sh</code>も設定する必要があります。<br /><br /><h3>hbase-env.sh</h3><code>JAVA_HOME</code>を設定します。<br /><br /><pre><code>export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home</code></pre><br />その他はデフォルトのままにしておきます。<br /><br /><h3>hbase-site.xml</h3><code>HBase</code>が使う<code>HDFS</code>のルートディレクトリを指定します。<br /><br /><pre><code>&lt;?xml version="1.0"?&gt;
+$ sudo ln -s hbase-0.20.5 hbase</code></pre><br />以降、このインストールディレクトリを <code>${HBASE_HOME}</code> と記述します。<br />また<code>Hadoop</code>がインストールされているディレクトリを<code>${HADOOP_HOME}</code>と記述します。<br /><br /><h2>HBase設定</h2>設定するファイルは<code>${HBASE_HOME}/conf</code>にある、<code>hbase-env.sh</code>、<code>hbase-site.xml</code>の２つです。<br />また、<code>HBase</code>を使って<code>Hadoop</code>で<code>MapReduce</code>するには、<code>${HADOOP_HOME}/conf/hadoop-env.sh</code>も設定する必要があります。<br /><br /><h3>hbase-env.sh</h3><code>JAVA_HOME</code>を設定します。<br /><br /><pre><code>export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home</code></pre><br />その他はデフォルトのままにしておきます。<br /><br /><h3>hbase-site.xml</h3><code>HBase</code>が使う<code>HDFS</code>のルートディレクトリを指定します。<br /><br /><pre><code>&lt;?xml version="1.0"?&gt;
 &lt;?xml-stylesheet type="text/xsl" href="configuration.xsl"?&gt;
 &lt;configuration&gt;
 
@@ -115,10 +115,10 @@ $ sudo ln -s hbase-0.20.5 hbase</code></pre><br />以降、このインストー
     &lt;value&gt;hdfs://localhost:9000/hbase&lt;/value&gt;
   &lt;/property&gt;
 
-&lt;/configuration&gt;</code></pre><br /><h3>hadoop-env.sh</h3><code>HBase</code>と連携して<code>MapReduce</code>する際には<code>Hadoop</code>から<code>HBase</code>のライブラリを参照する必要がありますので、<code>HADOOP_CLASSPATH</code>を設定します。<br /><br /><pre><code>export HADOOP_CLASSPATH=/opt/local/share/scala-2.8/lib/scala-library.jar:/usr/local/hbase/conf:/usr/local/hbase/hbase-0.20.5.jar:/usr/local/hbase/lib/zookeeper-3.2.2.jar</code></pre><br />後述の<code>MapReduce</code>の動作確認を行う場合には、<code>hbase-0.20.5-test.jar</code>も<code>HADDOP_CLASSPATH</code>に追加しておいてください。<br /><br /><h3>ログディレクトリ</h3><code>\${HBASE_HOME}/logs</code>がない場合には作成しておきます。<br /><br /><pre><code>$ sudo mkdir \${HBASE_HOME}/logs
-$ sudo chown hadoop:hadoop \${HBASE_HOME}/logs</code></pre><br /><h2>HBase起動</h2><code>hadoop</code>ユーザーで、<code>Hadoop</code>および<code>HBase</code>を起動します。<br /><br /><pre><code>$ sudo su - hadoop
-$ \${HADOOP_HOME}/bin/start-all.sh
-$ \${HBASE_HOME}/bin/start-hbase.sh</code></pre><br />これで無事に起動しました。<br /><br /><h3>動作確認</h3><code>HBase Shell</code>から、いくつかコマンドを実行してみます。<br /><br /><pre><code>$ \${HBASE_HOME}/bin/hbase shell
+&lt;/configuration&gt;</code></pre><br /><h3>hadoop-env.sh</h3><code>HBase</code>と連携して<code>MapReduce</code>する際には<code>Hadoop</code>から<code>HBase</code>のライブラリを参照する必要がありますので、<code>HADOOP_CLASSPATH</code>を設定します。<br /><br /><pre><code>export HADOOP_CLASSPATH=/opt/local/share/scala-2.8/lib/scala-library.jar:/usr/local/hbase/conf:/usr/local/hbase/hbase-0.20.5.jar:/usr/local/hbase/lib/zookeeper-3.2.2.jar</code></pre><br />後述の<code>MapReduce</code>の動作確認を行う場合には、<code>hbase-0.20.5-test.jar</code>も<code>HADDOP_CLASSPATH</code>に追加しておいてください。<br /><br /><h3>ログディレクトリ</h3><code>${HBASE_HOME}/logs</code>がない場合には作成しておきます。<br /><br /><pre><code>$ sudo mkdir ${HBASE_HOME}/logs
+$ sudo chown hadoop:hadoop ${HBASE_HOME}/logs</code></pre><br /><h2>HBase起動</h2><code>hadoop</code>ユーザーで、<code>Hadoop</code>および<code>HBase</code>を起動します。<br /><br /><pre><code>$ sudo su - hadoop
+$ ${HADOOP_HOME}/bin/start-all.sh
+$ ${HBASE_HOME}/bin/start-hbase.sh</code></pre><br />これで無事に起動しました。<br /><br /><h3>動作確認</h3><code>HBase Shell</code>から、いくつかコマンドを実行してみます。<br /><br /><pre><code>$ ${HBASE_HOME}/bin/hbase shell
 
 hbase&gt; # Type "help" to see shell help screen
 hbase&gt; help
@@ -131,7 +131,7 @@ hbase&gt; put "mylittletable", "myrow", "mylittlecolumnfamily:x", "v"
 hbase&gt; # To get the cell just added, do
 hbase&gt; get "mylittletable", "myrow"
 hbase&gt; # To scan you new table, do
-hbase&gt; scan "mylittletable"</code></pre><br />MapReduceの動作確認のために<code>PerformanceEvaluation</code>を実行してみます。<br />※ 重いプログラムなので気をつけてください。<br /><br /><pre><code>$ \${HADOOP_HOME}/bin/hadoop org.apache.hadoop.hbase.PerformanceEvaluation sequentialWrite 4</code></pre><br />擬似分散環境の<code>Hadoop</code>で<code>MapReduce</code>が動きました。<br /><br />
+hbase&gt; scan "mylittletable"</code></pre><br />MapReduceの動作確認のために<code>PerformanceEvaluation</code>を実行してみます。<br />※ 重いプログラムなので気をつけてください。<br /><br /><pre><code>$ ${HADOOP_HOME}/bin/hadoop org.apache.hadoop.hbase.PerformanceEvaluation sequentialWrite 4</code></pre><br />擬似分散環境の<code>Hadoop</code>で<code>MapReduce</code>が動きました。<br /><br />
                                     </div>
 
                                 </div>
