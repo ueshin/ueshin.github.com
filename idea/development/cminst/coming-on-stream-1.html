@@ -99,12 +99,14 @@
                                 <div class="asset-content entry-content">
 
                                     <div class="asset-body">
-                                        TwitterのStreaming APIを使ってツイートを収集し、様々な解析をする（したい）ためのプログラムを開発しています。<br />元々は7月に<a href="http://atnd.org/events/6414" target="_blank">NoSQL会@博多</a>で<a href="http://happy-camper.st/others/20100724-nosql-hakata.html">HBaseについて発表した際</a>のサンプルだったのですが、そのまま引き続き開発を続けています。<br /><br />最近になってプロジェクト名を「<strong>Coming on Stream</strong>」に決めました。<br /><br />下記で参照できるプログラムの動作環境は<br /><br /><ul><li>Hadoop: 0.20.2</li><li>HBase: 0.20.5<br /></li><li>Scala: 2.8.0</li></ul><br />を利用していますが、HBaseは0.20.6でも動作すると思います。<br /><br /><pre><code>$ svn checkout https://happy-camper.st/svn/hadoop/tags/hbase-twitter-0.0.1 hbase-twitter</code></pre><br />で利用できます。<br /><br />また <a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1" target="_blank">http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1</a>でブラウズできます。<br /><br />
+                                        TwitterのStreaming APIを使ってツイートを収集し、様々な解析をする（したい）ためのプログラムを開発しています。<br />元々は7月に<a href="http://atnd.org/events/6414" target="_blank">NoSQL会@博多</a>で<a href="http://happy-camper.st/others/20100724-nosql-hakata.html">HBaseについて発表した際</a>のサンプルだったのですが、そのまま引き続き開発を続けています。<br /><br />最近になってプロジェクト名を「<strong>Coming on Stream</strong>」に決めました。<br /><br />下記で参照できるプログラムの動作環境は<br /><br /><ul><li>Hadoop: 0.20.2</li><li>HBase: 0.20.5<br /></li><li>Scala: 2.8.0</li></ul><br />を利用していますが、HBaseは0.20.6でも動作すると思います。<br /><br /><pre><code>$ git clone https://github.com/ueshin/hbase-twitter.git
+$ cd hbase-twitter
+$ git checkout hbase-twitter-0.0.1</code></pre><br />で利用できます。<br /><br />また <a href="https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.1" target="_blank">https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.1</a>でブラウズできます。<br /><br />
                                     </div>
 
 
                                     <div id="more" class="asset-more">
-                                        <h2>ツイートを収集する<br /></h2>まずはStreaming APIを使ってHBaseにツイートを蓄えていきます。<br /><br /><h3><code>twitter</code>テーブル</h3>格納用のHBaseテーブルイメージを <a href="http://happy-camper.st/others/20100724-nosql-hakata.html">発表資料スライド p.14</a> に掲載しています。<br /><br />要するに、 縦方向行キーにユーザーID、カラムファミリー <code>user</code> にそれぞれユーザー情報を格納、カラムファミリー <code>status</code> にステータスを格納していきます。<br />格納時点のバージョン（タイムスタンプ）が、（ほぼ）ユーザーがツイートした時刻、格納する値は<code>Status</code>オブジェクト（のバイナリ表現）になります。<br />あるユーザーのツイート(status)が横方向に伸びていくイメージです。<br /><br />テーブルの<code>create</code>文は次のようになります。<br /><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/resources/create.rb" target="_blank">create.rb</a><br /><br /><pre><code>create 'twitter', { NAME =&gt; 'user' }, { NAME =&gt; 'status' }</code></pre><br /><h3>Streaming API</h3>Twitterからの取り込みは、<a href="http://dev.twitter.com/pages/streaming_api" target="_blank">Streaming API</a>を使います。<br />主な部分は簡易的に<a href="http://happy-camper.st/lang/scala/twitter-streaming-api.html">以前作った</a>ことがあるので、それをベースに、<code>Handler</code>を実装します。<br /><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/handler/HTableHandler.scala">HTableHandler.scala</a><br /><br /><pre><code>  val table = new HTable("twitter")
+                                        <h2>ツイートを収集する<br /></h2>まずはStreaming APIを使ってHBaseにツイートを蓄えていきます。<br /><br /><h3><code>twitter</code>テーブル</h3>格納用のHBaseテーブルイメージを <a href="http://happy-camper.st/others/20100724-nosql-hakata.html">発表資料スライド p.14</a> に掲載しています。<br /><br />要するに、 縦方向行キーにユーザーID、カラムファミリー <code>user</code> にそれぞれユーザー情報を格納、カラムファミリー <code>status</code> にステータスを格納していきます。<br />格納時点のバージョン（タイムスタンプ）が、（ほぼ）ユーザーがツイートした時刻、格納する値は<code>Status</code>オブジェクト（のバイナリ表現）になります。<br />あるユーザーのツイート(status)が横方向に伸びていくイメージです。<br /><br />テーブルの<code>create</code>文は次のようになります。<br /><br /><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.1/src/main/resources/create.rb" target="_blank">create.rb</a><br /><br /><pre><code>create 'twitter', { NAME =&gt; 'user' }, { NAME =&gt; 'status' }</code></pre><br /><h3>Streaming API</h3>Twitterからの取り込みは、<a href="http://dev.twitter.com/pages/streaming_api" target="_blank">Streaming API</a>を使います。<br />主な部分は簡易的に<a href="http://happy-camper.st/lang/scala/twitter-streaming-api.html">以前作った</a>ことがあるので、それをベースに、<code>Handler</code>を実装します。<br /><br /><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/handler/HTableHandler.scala" target="_blank">HTableHandler.scala</a><br /><br /><pre><code>  val table = new HTable("twitter")
 
                 ・・・
 
@@ -334,7 +336,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     </div>
 </div>
 <div class="widget-calendar widget">
-    <h3 class="widget-header">2012年9月</h3>
+    <h3 class="widget-header">2013年10月</h3>
     <div class="widget-content">
         <table summary="リンク付きのカレンダー">
             <tr>
@@ -369,48 +371,12 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
                     1
         
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -450,7 +416,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -480,11 +450,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -524,7 +490,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -554,11 +524,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -598,7 +564,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -628,11 +598,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -672,7 +638,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -702,11 +672,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -721,31 +687,9 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
+                    31
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
                 </td>
         
     
@@ -850,14 +794,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
             </li>
         
-    
-        
-        
-            <li><a href="http://happy-camper.st/lang/java/guice/">Guice (2)</a>
-        
-        
-            </li>
-        
         </ul>
         
     
@@ -915,7 +851,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
         
         
-            <li><a href="http://happy-camper.st/idea/">ネタ (3)</a>
+            <li><a href="http://happy-camper.st/idea/">ネタ (2)</a>
         
         
         
@@ -930,14 +866,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
         
             <li><a href="http://happy-camper.st/idea/development/cminst/">cminst (5)</a>
-        
-        
-            </li>
-        
-    
-        
-        
-            <li><a href="http://happy-camper.st/idea/development/siphon/">Siphon (2)</a>
         
         
             </li>
@@ -1046,11 +974,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
     
         
-            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (11)</a></li>
+            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (8)</a></li>
         
     
         
-            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (14)</a></li>
+            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (13)</a></li>
         
     
         

@@ -99,12 +99,14 @@
                                 <div class="asset-content entry-content">
 
                                     <div class="asset-body">
-                                        １年以上のご無沙汰でした。<br />お久しぶりです。<br /><br />さすがにこれだけ期間が開くとHadoopのバージョンも<a href="http://hadoop.apache.org/common/releases.html" target="_blank">0.20.2</a>が最新となっています。(2010/04/22現在)<br /><br />そこで、以前実装した<a href="http://happy-camper.st/lang/java/hadoop/hadoop-aggregate-002.html">hadoop-aggregate-0.0.2</a>を元に、hadoop-core-0.20.2の最新APIに更新してみようと思います。<br /><br />以前と同じように、<br /><br /><pre><code>$ svn checkout https://happy-camper.st/svn/hadoop/tags/hadoop-aggregate-0.20.1 hadoop-aggregate</code></pre><br />で利用できます。<br /><br />また <a href="http://hadoop.happy-camper.st/browser/tags/hadoop-aggregate-0.20.1" target="_blank">http://hadoop.happy-camper.st/browser/tags/hadoop-aggregate-0.20.1</a> でブラウズできます。<br /><br />
+                                        １年以上のご無沙汰でした。<br />お久しぶりです。<br /><br />さすがにこれだけ期間が開くとHadoopのバージョンも<a href="http://hadoop.apache.org/common/releases.html" target="_blank">0.20.2</a>が最新となっています。(2010/04/22現在)<br /><br />そこで、以前実装した<a href="http://happy-camper.st/lang/java/hadoop/hadoop-aggregate-002.html">hadoop-aggregate-0.0.2</a>を元に、hadoop-core-0.20.2の最新APIに更新してみようと思います。<br /><br />以前と同じように、<br /><br /><pre><code>$ git clone https://github.com/ueshin/hadoop-aggregate.git
+$ cd hadoop-aggregate
+$ git checkout hadoop-aggregate-0.20.1</code></pre><br />で利用できます。<br /><br />また <a href="https://github.com/ueshin/hadoop-aggregate/tree/hadoop-aggregate-0.20.1" target="_blank">https://github.com/ueshin/hadoop-aggregate/tree/hadoop-aggregate-0.20.1</a> でブラウズできます。<br /><br />
                                     </div>
 
 
                                     <div id="more" class="asset-more">
-                                        <h2>ポイント</h2><h3>pom.xml</h3><a href="http://hadoop.happy-camper.st/browser/tags/hadoop-aggregate-0.20.1/pom.xml" target="_blank">pom.xmlファイルはこちらを参照。</a> (<a href="http://hadoop.happy-camper.st/changeset/16" target="_blank">diff</a>)<br /><br /><code>hadoop-core</code>のバージョンを 0.18.1 だったものを 0.20.2 に更新。<br />以前はMaven2レポジトリになかったけど、最新版は置いてありました。<br />Hadoopサーバー用の依存が多いので、excludeしておきます。<br /><br /><h3>新旧APIの違い</h3><a href="http://hadoop.happy-camper.st/browser/tags/hadoop-aggregate-0.20.1/src/main/java/st/happy_camper/hadoop/aggregate/Aggregator.java" target="_blank">当該箇所のソースファイルはこちらを参照。</a> (<a href="http://hadoop.happy-camper.st/changeset/17" target="_blank">diff</a>)<br /><br />パッケージが新しくなっています。<br />(<code>org.apache.hadoop.mapred</code> → <code>org.apache.hadoop.mapreduce</code>)<br /><br />古いAPIでは<code>interface</code>だった<code>Mapper</code> / <code>Reducer</code>が、<code>class</code>になっています。<br /><code>MapReduceBase</code>を継承、<code>Mapper</code> / <code>Reducer</code>を<code>implements</code>だったものが、<code>Mapper</code> / <code>Reducer</code>を直接継承する形になっています。<br /><br /><code>map</code> / <code>reduce</code>メソッドの引数が変わっています。<br />以前は<code>key</code>と<code>value</code>の他に<code>OutputCollector</code>と<code>Reporter</code>を引数でとるようになっていましたが、<code>Context</code>クラスに集約されました。<br /><code>reduce</code>メソッドの方の<code>values</code>は、<code>Iterator</code>だったものが<code>Iterable</code>に変わっています。<br />これにより拡張for文でループさせることができるようになりました。<br /><br />今回の対象のような簡単なサンプルであれば、上記くらいの修正で新しいAPIに移行することができました。<br /><br />ところで、古いAPIは依然として利用できますので、無理に新しいAPIを利用する必要は（まだ）ありません。<br /><br /><h3>実行</h3>以前<a href="http://happy-camper.st/lang/java/maven2/plugins/application-assembler-maven-plugin.html">Application Assembler Maven Plugin</a>で紹介した、appassemblerを利用して起動するようにpom.xmlファイルを修正してあります。<br /><br /><pre><code>$ mvn clean package
+                                        <h2>ポイント</h2><h3>pom.xml</h3><a href="https://github.com/ueshin/hadoop-aggregate/blob/hadoop-aggregate-0.20.1/pom.xml" target="_blank">pom.xmlファイルはこちらを参照。</a> (<a href="https://github.com/ueshin/hadoop-aggregate/commit/3765160437d66d63d6708059ec3b88f98adcfd12" target="_blank">diff</a>)<br /><br /><code>hadoop-core</code>のバージョンを 0.18.1 だったものを 0.20.2 に更新。<br />以前はMaven2レポジトリになかったけど、最新版は置いてありました。<br />Hadoopサーバー用の依存が多いので、excludeしておきます。<br /><br /><h3>新旧APIの違い</h3><a href="https://github.com/ueshin/hadoop-aggregate/blob/hadoop-aggregate-0.20.1/src/main/java/st/happy_camper/hadoop/aggregate/Aggregator.java" target="_blank">当該箇所のソースファイルはこちらを参照。</a> (<a href="https://github.com/ueshin/hadoop-aggregate/commit/ac4610c898b8c79af57beac33decfd625fe3fb0a" target="_blank">diff</a>)<br /><br />パッケージが新しくなっています。<br />(<code>org.apache.hadoop.mapred</code> → <code>org.apache.hadoop.mapreduce</code>)<br /><br />古いAPIでは<code>interface</code>だった<code>Mapper</code> / <code>Reducer</code>が、<code>class</code>になっています。<br /><code>MapReduceBase</code>を継承、<code>Mapper</code> / <code>Reducer</code>を<code>implements</code>だったものが、<code>Mapper</code> / <code>Reducer</code>を直接継承する形になっています。<br /><br /><code>map</code> / <code>reduce</code>メソッドの引数が変わっています。<br />以前は<code>key</code>と<code>value</code>の他に<code>OutputCollector</code>と<code>Reporter</code>を引数でとるようになっていましたが、<code>Context</code>クラスに集約されました。<br /><code>reduce</code>メソッドの方の<code>values</code>は、<code>Iterator</code>だったものが<code>Iterable</code>に変わっています。<br />これにより拡張for文でループさせることができるようになりました。<br /><br />今回の対象のような簡単なサンプルであれば、上記くらいの修正で新しいAPIに移行することができました。<br /><br />ところで、古いAPIは依然として利用できますので、無理に新しいAPIを利用する必要は（まだ）ありません。<br /><br /><h3>実行</h3>以前<a href="http://happy-camper.st/lang/java/maven2/plugins/application-assembler-maven-plugin.html">Application Assembler Maven Plugin</a>で紹介した、appassemblerを利用して起動するようにpom.xmlファイルを修正してあります。<br /><br /><pre><code>$ mvn clean package
 $ cd target/appassembler/
 $ sh bin/aggregator &lt;in-dir&gt; &lt;out-dir&gt;</code></pre><br /><code>&lt;in-dir&gt;</code>に<code>Combined</code>形式のApacheアクセスログを設置しておいてください。<br /><br /><h2>注意</h2><h3><code>&lt;in-dir&gt;</code></h3>古いAPIでは、<code>&lt;in-dir&gt;</code>にファイルが無かった場合にもタスク０件で処理されていたんですが、新しいAPIでは<code>java.lang.IndexOutOfBoundsException</code>が発生してしまうようです。<br /><br /><h3>スタンドアロンのみ</h3>現状ですと、外部ライブラリ(<code>commons-lang</code>)を利用しているので、このままでは分散環境で利用できません。分散環境で実行する場合には、各ノード上でクラスパスを通しておくなどする必要があります。<br /><div><br /></div>
                                     </div>
@@ -318,7 +320,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     </div>
 </div>
 <div class="widget-calendar widget">
-    <h3 class="widget-header">2012年9月</h3>
+    <h3 class="widget-header">2013年10月</h3>
     <div class="widget-content">
         <table summary="リンク付きのカレンダー">
             <tr>
@@ -353,48 +355,12 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
                     1
         
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -434,7 +400,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -464,11 +434,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -508,7 +474,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -538,11 +508,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -582,7 +548,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -612,11 +582,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -656,7 +622,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -686,11 +656,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -705,31 +671,9 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
+                    31
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
                 </td>
         
     
@@ -834,14 +778,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
             </li>
         
-    
-        
-        
-            <li><a href="http://happy-camper.st/lang/java/guice/">Guice (2)</a>
-        
-        
-            </li>
-        
         </ul>
         
     
@@ -899,7 +835,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
         
         
-            <li><a href="http://happy-camper.st/idea/">ネタ (3)</a>
+            <li><a href="http://happy-camper.st/idea/">ネタ (2)</a>
         
         
         
@@ -914,14 +850,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
         
             <li><a href="http://happy-camper.st/idea/development/cminst/">cminst (5)</a>
-        
-        
-            </li>
-        
-    
-        
-        
-            <li><a href="http://happy-camper.st/idea/development/siphon/">Siphon (2)</a>
         
         
             </li>
@@ -1030,11 +958,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
     
         
-            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (11)</a></li>
+            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (8)</a></li>
         
     
         
-            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (14)</a></li>
+            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (13)</a></li>
         
     
         

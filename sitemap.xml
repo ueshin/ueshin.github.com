@@ -13,10 +13,6 @@
 </url>
 
 <url>
-<loc>http://happy-camper.st/lang/java/guice/</loc>
-</url>
-
-<url>
 <loc>http://happy-camper.st/lang/java/hadoop/</loc>
 </url>
 
@@ -50,10 +46,6 @@
 
 <url>
 <loc>http://happy-camper.st/lang/scala/</loc>
-</url>
-
-<url>
-<loc>http://happy-camper.st/idea/development/siphon/</loc>
 </url>
 
 <url>
@@ -207,37 +199,37 @@
 
 <url>
 <loc>http://happy-camper.st/idea/development/cminst/coming-on-stream-5.html</loc>
-<lastmod>2012-09-05T16:31:22Z</lastmod>
+<lastmod>2013-10-02T18:04:37Z</lastmod>
 </url>
 
 <url>
 <loc>http://happy-camper.st/idea/development/cminst/coming-on-stream-4.html</loc>
-<lastmod>2012-09-05T16:31:22Z</lastmod>
+<lastmod>2013-10-02T17:52:24Z</lastmod>
 </url>
 
 <url>
 <loc>http://happy-camper.st/idea/development/cminst/coming-on-stream-3.html</loc>
-<lastmod>2012-09-05T16:31:22Z</lastmod>
+<lastmod>2013-10-02T17:47:27Z</lastmod>
 </url>
 
 <url>
 <loc>http://happy-camper.st/idea/development/cminst/coming-on-stream-2.html</loc>
-<lastmod>2012-09-05T16:31:22Z</lastmod>
+<lastmod>2013-10-02T17:41:50Z</lastmod>
 </url>
 
 <url>
 <loc>http://happy-camper.st/idea/development/cminst/coming-on-stream-1.html</loc>
-<lastmod>2012-09-05T16:31:21Z</lastmod>
+<lastmod>2013-10-02T17:32:41Z</lastmod>
 </url>
 
 <url>
 <loc>http://happy-camper.st/others/20100724-nosql-hakata.html</loc>
-<lastmod>2012-09-05T16:31:21Z</lastmod>
+<lastmod>2013-10-02T17:14:08Z</lastmod>
 </url>
 
 <url>
 <loc>http://happy-camper.st/lang/java/hbase/hbase-mapreduce-in-scala.html</loc>
-<lastmod>2012-09-15T06:17:32Z</lastmod>
+<lastmod>2013-10-02T17:11:12Z</lastmod>
 </url>
 
 <url>
@@ -252,7 +244,7 @@
 
 <url>
 <loc>http://happy-camper.st/lang/java/hadoop/pseudo-distributed-test.html</loc>
-<lastmod>2012-09-15T06:21:22Z</lastmod>
+<lastmod>2013-10-02T16:59:34Z</lastmod>
 </url>
 
 <url>
@@ -272,17 +264,17 @@
 
 <url>
 <loc>http://happy-camper.st/lang/java/hadoop/pig-latin-udf-in-scala.html</loc>
-<lastmod>2012-09-15T06:24:42Z</lastmod>
+<lastmod>2013-10-02T16:42:10Z</lastmod>
 </url>
 
 <url>
 <loc>http://happy-camper.st/lang/java/hadoop/mapreduce-in-scala.html</loc>
-<lastmod>2012-09-05T16:31:20Z</lastmod>
+<lastmod>2013-10-02T16:31:24Z</lastmod>
 </url>
 
 <url>
 <loc>http://happy-camper.st/lang/java/hadoop/hadoop-core-0-20-2.html</loc>
-<lastmod>2012-09-05T16:31:20Z</lastmod>
+<lastmod>2013-10-02T16:22:51Z</lastmod>
 </url>
 
 <url>
@@ -316,21 +308,6 @@
 </url>
 
 <url>
-<loc>http://happy-camper.st/lang/java/guice/servlet-scopes.html</loc>
-<lastmod>2012-09-05T16:31:19Z</lastmod>
-</url>
-
-<url>
-<loc>http://happy-camper.st/lang/java/guice/getting-started.html</loc>
-<lastmod>2012-09-05T16:31:19Z</lastmod>
-</url>
-
-<url>
-<loc>http://happy-camper.st/idea/development/siphon/siphon-framework.html</loc>
-<lastmod>2012-09-05T16:31:18Z</lastmod>
-</url>
-
-<url>
 <loc>http://happy-camper.st/lang/java/maven2/out-of-memory-error.html</loc>
 <lastmod>2012-09-05T16:31:18Z</lastmod>
 </url>
@@ -347,12 +324,12 @@
 
 <url>
 <loc>http://happy-camper.st/lang/java/hadoop/hadoop-aggregate-002.html</loc>
-<lastmod>2012-09-15T06:27:53Z</lastmod>
+<lastmod>2013-10-02T15:52:53Z</lastmod>
 </url>
 
 <url>
 <loc>http://happy-camper.st/lang/java/hadoop/hadoop-aggregate.html</loc>
-<lastmod>2012-09-05T16:31:18Z</lastmod>
+<lastmod>2013-10-02T15:46:27Z</lastmod>
 </url>
 
 <url>
@@ -387,11 +364,6 @@
 
 <url>
 <loc>http://happy-camper.st/lang/java/maven2/module.html</loc>
-<lastmod>2012-09-05T16:31:17Z</lastmod>
-</url>
-
-<url>
-<loc>http://happy-camper.st/idea/development/siphon/siphon.html</loc>
 <lastmod>2012-09-05T16:31:17Z</lastmod>
 </url>
 

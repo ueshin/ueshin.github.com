@@ -99,12 +99,14 @@
                                 <div class="asset-content entry-content">
 
                                     <div class="asset-body">
-                                        オリジナルのHadoop MapReduceアプリケーション第一弾、<a href="http://hadoop.happy-camper.st/browser/tags/hadoop-aggregate-0.0.1/" target="_blank">hadoop-aggregate</a>を開発しました。<br /><br />ApacheのアクセスログCombined形式のファイルから、<br /><br /><ul><li>どこから (IPアドレス)</li><li>どのページに (URL)</li><li>何回アクセスしたか。</li></ul><br />をTSV形式のファイルで出力します。<br />
+                                        オリジナルのHadoop MapReduceアプリケーション第一弾、<a href="https://github.com/ueshin/hadoop-aggregate/tree/hadoop-aggregate-0.0.1" target="_blank">hadoop-aggregate</a>を開発しました。<br /><br />ApacheのアクセスログCombined形式のファイルから、<br /><br /><ul><li>どこから (IPアドレス)</li><li>どのページに (URL)</li><li>何回アクセスしたか。</li></ul><br />をTSV形式のファイルで出力します。<br />
                                     </div>
 
 
                                     <div id="more" class="asset-more">
-                                        <h2>実行手順</h2><h3>準備</h3>あらかじめ、<a href="http://happy-camper.st/lang/java/hadoop/mapreduce-setup.html">MapReduceプログラム開発準備</a>を参考にHadoopをインストールしておいてください。<br />また、適当なサイトからApacheアクセスログCombined形式のものを手元に持ってきておいてください。<br /><br /><h3>チェックアウト</h3><pre><code>$ svn checkout https://happy-camper.st/svn/hadoop/tags/hadoop-aggregate-0.0.1 hadoop-aggregate</code></pre><br /><h3>パッケージング</h3><pre><code>$ mvn clean package</code></pre><br /><h3>実行</h3>持ってきたアクセスログを src/test/resources 以下に置いたものとします。<br />複数のファイルがあっても、<a href="http://www.zlib.net/" target="_blank">zlib</a> / <a href="http://www.oberhumer.com/opensource/lzo/" target="_blank">lzo</a> / <a href="http://www.gzip.org/" target="_blank">gzip</a>の形式であれば圧縮されていても大丈夫です。<br /><br /><pre><code>$ [HADOOP_HOME]/bin/hadoop jar target/hadoop-aggregate-0.0.1.jar \
+                                        <h2>実行手順</h2><h3>準備</h3>あらかじめ、<a href="http://happy-camper.st/lang/java/hadoop/mapreduce-setup.html">MapReduceプログラム開発準備</a>を参考にHadoopをインストールしておいてください。<br />また、適当なサイトからApacheアクセスログCombined形式のものを手元に持ってきておいてください。<br /><br /><h3>チェックアウト</h3><pre><code>$ git clone https://github.com/ueshin/hadoop-aggregate.git
+$ cd hadoop-aggregate
+$ git checkout hadoop-aggregate-0.0.1</code></pre><br /><h3>パッケージング</h3><pre><code>$ mvn clean package</code></pre><br /><h3>実行</h3>持ってきたアクセスログを src/test/resources 以下に置いたものとします。<br />複数のファイルがあっても、<a href="http://www.zlib.net/" target="_blank">zlib</a> / <a href="http://www.oberhumer.com/opensource/lzo/" target="_blank">lzo</a> / <a href="http://www.gzip.org/" target="_blank">gzip</a>の形式であれば圧縮されていても大丈夫です。<br /><br /><pre><code>$ [HADOOP_HOME]/bin/hadoop jar target/hadoop-aggregate-0.0.1.jar \
     src/test/resources/ \
     target/output
 $ cat target/output/part-00000</code></pre><br />とすると、<br /><br /><blockquote>IP\tURL\tCount<br /></blockquote><br />の形式のアクセス集計が見れます。<br /><br /><h2>まとめ</h2><h3>MapReduceの動作を調べるために試したこと。</h3><ul><li><code>Tool</code> / <code>ToolRunner</code>を使ってみた。<br /></li><li><code>Combine</code>を入れてみた。<br /></li><li><code>Map</code> → <code>Combine</code> → <code>Reduce</code>間のデータのキーを、自分で作ってみた。</li><li><code>Combine</code>の動きを見るため、あえて<code>Combine</code>の出力キーと<code>Reduce</code>の出力キーを変えてみた。<br /></li></ul><br /><h3>わかったこと</h3><ul><li><code>Combine</code>は、Mapが終わったらすぐに動く。<br /><code>Map</code>のタスクごとに一旦<code>Reduce</code>するイメージ。<br /><br /></li><li><code>Combine</code>の入力と出力は同じクラスのペアでなければならない。<br /><br /><pre><code>class Combine implements Reducer&lt;K,V,K,V&gt;</code></pre><br />な感じ。<br /><br /></li><li>キーの作り方。<br /><code>WritableComparable</code>を実装したクラスであればいい。<br />実装するメソッドは次の3つ。<br /><br /><pre><code>public void readFields(DataInput in) throws IOException;
@@ -270,7 +272,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     </div>
 </div>
 <div class="widget-calendar widget">
-    <h3 class="widget-header">2012年9月</h3>
+    <h3 class="widget-header">2013年10月</h3>
     <div class="widget-content">
         <table summary="リンク付きのカレンダー">
             <tr>
@@ -305,48 +307,12 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
                     1
         
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -386,7 +352,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -416,11 +386,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -460,7 +426,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -490,11 +460,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -534,7 +500,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -564,11 +534,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -608,7 +574,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -638,11 +608,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -657,31 +623,9 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
+                    31
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
                 </td>
         
     
@@ -786,14 +730,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
             </li>
         
-    
-        
-        
-            <li><a href="http://happy-camper.st/lang/java/guice/">Guice (2)</a>
-        
-        
-            </li>
-        
         </ul>
         
     
@@ -851,7 +787,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
         
         
-            <li><a href="http://happy-camper.st/idea/">ネタ (3)</a>
+            <li><a href="http://happy-camper.st/idea/">ネタ (2)</a>
         
         
         
@@ -866,14 +802,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
         
             <li><a href="http://happy-camper.st/idea/development/cminst/">cminst (5)</a>
-        
-        
-            </li>
-        
-    
-        
-        
-            <li><a href="http://happy-camper.st/idea/development/siphon/">Siphon (2)</a>
         
         
             </li>
@@ -982,11 +910,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
     
         
-            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (11)</a></li>
+            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (8)</a></li>
         
     
         
-            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (14)</a></li>
+            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (13)</a></li>
         
     
         

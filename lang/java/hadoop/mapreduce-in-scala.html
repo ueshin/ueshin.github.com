@@ -99,14 +99,16 @@
                                 <div class="asset-content entry-content">
 
                                     <div class="asset-body">
-                                        目下勉強中の<a href="http://www.scala-lang.org/" target="_blank">Scala</a> という言語を使って、<code>MapReduce</code>を実装してみました。<br /><br />題材は<a href="http://happy-camper.st/lang/java/hadoop/hadoop-core-0-20-2.html">前回</a>のものと同じです。<br /><br /><ul><li>Hadoop: 0.20.2</li><li>Scala: 2.8.0.Beta1</li></ul><br />を利用しています。<br /><br /><pre><code>$ svn checkout https://happy-camper.st/svn/hadoop/tags/hadoop-scala-aggregate-0.20.1 hadoop-scala-aggregate</code></pre><br />で利用できます。<br /><br />また <a href="http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.1" target="_blank">http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.1</a> でブラウズできます。<br /><br />
+                                        目下勉強中の<a href="http://www.scala-lang.org/" target="_blank">Scala</a> という言語を使って、<code>MapReduce</code>を実装してみました。<br /><br />題材は<a href="http://happy-camper.st/lang/java/hadoop/hadoop-core-0-20-2.html">前回</a>のものと同じです。<br /><br /><ul><li>Hadoop: 0.20.2</li><li>Scala: 2.8.0.Beta1</li></ul><br />を利用しています。<br /><br /><pre><code>$ git clone https://github.com/ueshin/hadoop-scala-aggregate.git
+$ cd hadoop-scala-aggregate
+$ git checkout hadoop-scala-aggregate-0.20.1</code></pre><br />で利用できます。<br /><br />また <a href="https://github.com/ueshin/hadoop-scala-aggregate/tree/hadoop-scala-aggregate-0.20.1" target="_blank">https://github.com/ueshin/hadoop-scala-aggregate/tree/hadoop-scala-aggregate-0.20.1</a> でブラウズできます。<br /><br />
                                     </div>
 
 
                                     <div id="more" class="asset-more">
-                                        <h2>ポイント</h2><h3>pom.xml</h3><a href="http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.1/pom.xml" target="_blank">pom.xmlファイルはこちらを参照。</a><br /><br />当たり前ですが、Hadoopへの依存とScalaへの依存を両方共記述します。<br />mvnでScalaプロジェクトを作った後にHadoopの分を追加していった方が楽でした。<br /><br /><h3>Scalaで書くと</h3><a href="http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala" target="_blank">当該箇所のソースファイルはこちらを参照。</a><br /><br />今回は結構単純に移植しただけなので、Scalaっぽさはあまり出ていません。<br />とはいえ、Scalaって便利だなぁと改めて思った点を上げます。<br /><br />Java版とScala版を並べて見比べてもらうと、言いたいことがわかりやすいかもしれません。<br /><br /><pre><code><a href="http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala#L52" target="_blank">L52</a>: case PATTERN(ip, accessDate, url)</code></pre><br />正規表現の場合、グループを変数に格納するのが上記のようなコードで記述することが出来ます。<br />これを覚えると、Javaの冗長な正規表現マッチングが嫌になります。<br /><br />ここでは正規表現のパターンマッチですが、caseクラスを使った場合にも同様のことができます。<br /><br /><pre><code><a href="http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala#L75" target="_blank">L75</a>/<a href="http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala#L88" target="_blank">L88</a>: values.foldLeft(0) { _ + _.get }</code></pre><br />Javaだとforループでちまちまと足し算をしていくところですが、Scalaではこのような記述ができます。<br />この他にも、関数型言語の宣言的で簡潔な表現をたくさん備えているので、コードがシンプルになっていきます。<br /><br /><h3>逆に</h3>これはたぶん僕の勉強不足なんですが、<br /><br /><pre><code><a href="http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala#L49" target="_blank">49</a>: context: Mapper[LongWritable, Text, AccessWritable, IntWritable]#Context
-<a href="http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala#L73" target="_blank">73</a>: context: Reducer[AccessWritable, IntWritable, AccessWritable, IntWritable]#Context
-<a href="http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala#L84" target="_blank">84</a>: context: Reducer[AccessWritable, IntWritable, Text, IntWritable]#Context</code></pre><br />この引数の型はこうしか書けないのだろうか。<br />ものすごく冗長な事になっちゃってます。<br /><br />簡潔に書ける方法をご存じの方は是非とも教えてください。<br /><br />
+                                        <h2>ポイント</h2><h3>pom.xml</h3><a href="https://github.com/ueshin/hadoop-scala-aggregate/blob/hadoop-scala-aggregate-0.20.1/pom.xml" target="_blank">pom.xmlファイルはこちらを参照。</a><br /><br />当たり前ですが、Hadoopへの依存とScalaへの依存を両方共記述します。<br />mvnでScalaプロジェクトを作った後にHadoopの分を追加していった方が楽でした。<br /><br /><h3>Scalaで書くと</h3><a href="https://github.com/ueshin/hadoop-scala-aggregate/blob/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala" target="_blank">当該箇所のソースファイルはこちらを参照。</a><br /><br />今回は結構単純に移植しただけなので、Scalaっぽさはあまり出ていません。<br />とはいえ、Scalaって便利だなぁと改めて思った点を上げます。<br /><br />Java版とScala版を並べて見比べてもらうと、言いたいことがわかりやすいかもしれません。<br /><br /><pre><code><a href="https://github.com/ueshin/hadoop-scala-aggregate/blob/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala#L52" target="_blank">L52</a>: case PATTERN(ip, accessDate, url)</code></pre><br />正規表現の場合、グループを変数に格納するのが上記のようなコードで記述することが出来ます。<br />これを覚えると、Javaの冗長な正規表現マッチングが嫌になります。<br /><br />ここでは正規表現のパターンマッチですが、caseクラスを使った場合にも同様のことができます。<br /><br /><pre><code><a href="https://github.com/ueshin/hadoop-scala-aggregate/blob/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala#L75" target="_blank">L75</a>/<a href="https://github.com/ueshin/hadoop-scala-aggregate/blob/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala#L88" target="_blank">L88</a>: values.foldLeft(0) { _ + _.get }</code></pre><br />Javaだとforループでちまちまと足し算をしていくところですが、Scalaではこのような記述ができます。<br />この他にも、関数型言語の宣言的で簡潔な表現をたくさん備えているので、コードがシンプルになっていきます。<br /><br /><h3>逆に</h3>これはたぶん僕の勉強不足なんですが、<br /><br /><pre><code><a href="https://github.com/ueshin/hadoop-scala-aggregate/blob/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala#L49" target="_blank">49</a>: context: Mapper[LongWritable, Text, AccessWritable, IntWritable]#Context
+<a href="https://github.com/ueshin/hadoop-scala-aggregate/blob/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala#L73" target="_blank">73</a>: context: Reducer[AccessWritable, IntWritable, AccessWritable, IntWritable]#Context
+<a href="https://github.com/ueshin/hadoop-scala-aggregate/blob/hadoop-scala-aggregate-0.20.1/src/main/scala/st/happy_camper/hadoop/scala/aggregate/Aggregator.scala#L84" target="_blank">84</a>: context: Reducer[AccessWritable, IntWritable, Text, IntWritable]#Context</code></pre><br />この引数の型はこうしか書けないのだろうか。<br />ものすごく冗長な事になっちゃってます。<br /><br />簡潔に書ける方法をご存じの方は是非とも教えてください。<br /><br />
                                     </div>
 
                                 </div>
@@ -267,7 +269,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     </div>
 </div>
 <div class="widget-calendar widget">
-    <h3 class="widget-header">2012年9月</h3>
+    <h3 class="widget-header">2013年10月</h3>
     <div class="widget-content">
         <table summary="リンク付きのカレンダー">
             <tr>
@@ -302,48 +304,12 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
                     1
         
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -383,7 +349,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -413,11 +383,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -457,7 +423,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -487,11 +457,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -531,7 +497,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -561,11 +531,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -605,7 +571,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -635,11 +605,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -654,31 +620,9 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
+                    31
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
                 </td>
         
     
@@ -783,14 +727,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
             </li>
         
-    
-        
-        
-            <li><a href="http://happy-camper.st/lang/java/guice/">Guice (2)</a>
-        
-        
-            </li>
-        
         </ul>
         
     
@@ -848,7 +784,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
         
         
-            <li><a href="http://happy-camper.st/idea/">ネタ (3)</a>
+            <li><a href="http://happy-camper.st/idea/">ネタ (2)</a>
         
         
         
@@ -863,14 +799,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
         
             <li><a href="http://happy-camper.st/idea/development/cminst/">cminst (5)</a>
-        
-        
-            </li>
-        
-    
-        
-        
-            <li><a href="http://happy-camper.st/idea/development/siphon/">Siphon (2)</a>
         
         
             </li>
@@ -979,11 +907,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
     
         
-            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (11)</a></li>
+            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (8)</a></li>
         
     
         
-            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (14)</a></li>
+            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (13)</a></li>
         
     
         

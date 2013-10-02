@@ -99,12 +99,14 @@
                                 <div class="asset-content entry-content">
 
                                     <div class="asset-body">
-                                        Coming on Streamシリーズもおおづめ。<br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-1.html">その1</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-2.html">その2</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-3.html">その3</a><br /><br />作ったものについて、は今回で終りになります。<br /><br />今回利用するプログラムも、<br /><br /><pre><code>$ svn checkout https://happy-camper.st/svn/hadoop/tags/hbase-twitter-0.0.2 hbase-twitter</code></pre><br />を利用します。<br /><br />また <a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2" target="_blank">http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2</a>でブラウズできます。<br /><br />
+                                        Coming on Streamシリーズもおおづめ。<br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-1.html">その1</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-2.html">その2</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-3.html">その3</a><br /><br />作ったものについて、は今回で終りになります。<br /><br />今回利用するプログラムも、<br /><br /><pre><code>$ git clone https://github.com/ueshin/hbase-twitter.git
+$ cd hbase-twitter
+$ git checkout hbase-twitter-0.0.2</code></pre><br />を利用します。<br /><br />また <a href="https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.2" target="_blank">https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.2</a>でブラウズできます。<br /><br />
                                     </div>
 
 
                                     <div id="more" class="asset-more">
-                                        <h2>ホットタグのスコア算出</h2>各言語毎に、最近頻繁にツイートされているホットタグを抽出ためのスコアを算出します。<br /><br />単純にツイート数だけでもよかったんですが、次のような制約を設けることにしました。<br /><br /><ul><li>設定した時間枠だけでなく、過去のツイート数も加味してスコアリングしたい。</li><li>かといって日常的にツイートされているタグ（ <a href="http://twitter.com/#search?q=%23followmejp" target="_blank">#followmejp</a> など ）には高いスコアを付けたくない。</li></ul><br />というわけで、<br /><br /><ol><li>過去２４時間の各時間枠（１時間おき）毎のツイート数に減衰係数を掛けたもの</li><li>上記を合算したものに、頻出度に応じたペナルティを掛ける。</li></ol><br />という感じにスコアリングしました。<br />検索のスコアリングアルゴリズムである <a href="http://ja.wikipedia.org/wiki/Tf-idf">tf-idf</a> を参考にしています。<br /><br />１で過去のツイート数が影響度を減衰しながらも影響を与え、２で日常的にツイートされているタグの抑制をします。<br /><br />計算結果は <code>tagtrend</code> テーブルに格納します。<br /><br /><h3><code>TagScoring</code></h3><a href="http://hadoop.happy-camper.st/browser/trunk/hbase-twitter/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala" target="_blank">TagScoring.scala</a><br /><br />集計対象となる言語を第1引数として必ず指定してください（<a href="http://hadoop.happy-camper.st/browser/trunk/hbase-twitter/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L25" target="_blank">25行目</a>）。<br /><br />集計の基準となる時刻は、引数で指定できるようになっています（<a href="http://hadoop.happy-camper.st/browser/trunk/hbase-twitter/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L28" target="_blank">28行目</a>）。<br />指定フォーマットは <code>"yyyyMMddHH"</code> で、指定しなかった場合のデフォルトは起動時刻の0分となります。<br /><br />MapReduceジョブでこれらを取得できるように設定しておきます（<a href="http://hadoop.happy-camper.st/browser/trunk/hbase-twitter/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L38" target="_blank">38行目</a>）。<br /><br />この時刻から、過去24時間が集計対象となります（<a href="http://hadoop.happy-camper.st/browser/trunk/hbase-twitter/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L46" target="_blank">46行目</a>）。<br /><br />集計元が<a href="http://happy-camper.st/development/cminst/coming-on-stream-3.html">前回</a>の転置テーブルになるので、転置処理が終わっているかどうかの確認処理なども入れています（<a href="http://hadoop.happy-camper.st/browser/trunk/hbase-twitter/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L58" target="_blank">58行目</a>）。<br /><br /><h3><code>TagScoringMapper</code></h3><a href="http://hadoop.happy-camper.st/browser/trunk/hbase-twitter/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala" target="_blank">TagScoringMapper.scala</a><br /><br />処理の前に、先程送り込んだ計算に必要な設定を取得しておきます（<a href="http://hadoop.happy-camper.st/browser/trunk/hbase-twitter/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L27" target="_blank">27行目</a>）。<br /><br /><code>map</code>処理では、各時間枠ごとのツイート数をカウントして（<a href="http://hadoop.happy-camper.st/browser/trunk/hbase-twitter/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L35" target="_blank">35行目</a>）、減衰係数をかけながら加算していき（<a href="http://hadoop.happy-camper.st/browser/trunk/hbase-twitter/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L41" target="_blank">41行目</a>）、最後にペナルティを掛けます（<a href="http://hadoop.happy-camper.st/browser/trunk/hbase-twitter/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L45" target="_blank">45行目</a>）、と。<br /><br /><code>languages</code>テーブルは、基準となる時間に何回ツイートがあったがを保存しつつ、集計が終わったことを表します。<br /><br /><h3>TweetHotTag</h3><a href="http://hadoop.happy-camper.st/browser/trunk/hbase-twitter/src/main/scala/st/happy_camper/hbase/twitter/TweetHotTag.scala" target="_blank">TweetHotTag.scala</a><br /><br />集計したスコアの高い順に100個のタグを出力します。<br />言語（必須）と時刻（任意：デフォルトは現在時刻0分）を指定します。<br /><br />クラス名が<code>Tweet〜〜</code>になっているのは（中略）OAuthに移行した<strike>せい</strike>からです。<br /><br /><h2>実行</h2>それでは実行してみます。<br /><br /><pre><code>$ sh target/appassembler/bin/scoring-tag ja
+                                        <h2>ホットタグのスコア算出</h2>各言語毎に、最近頻繁にツイートされているホットタグを抽出ためのスコアを算出します。<br /><br />単純にツイート数だけでもよかったんですが、次のような制約を設けることにしました。<br /><br /><ul><li>設定した時間枠だけでなく、過去のツイート数も加味してスコアリングしたい。</li><li>かといって日常的にツイートされているタグ（ <a href="http://twitter.com/#search?q=%23followmejp" target="_blank">#followmejp</a> など ）には高いスコアを付けたくない。</li></ul><br />というわけで、<br /><br /><ol><li>過去２４時間の各時間枠（１時間おき）毎のツイート数に減衰係数を掛けたもの</li><li>上記を合算したものに、頻出度に応じたペナルティを掛ける。</li></ol><br />という感じにスコアリングしました。<br />検索のスコアリングアルゴリズムである <a href="http://ja.wikipedia.org/wiki/Tf-idf">tf-idf</a> を参考にしています。<br /><br />１で過去のツイート数が影響度を減衰しながらも影響を与え、２で日常的にツイートされているタグの抑制をします。<br /><br />計算結果は <code>tagtrend</code> テーブルに格納します。<br /><br /><h3><code>TagScoring</code></h3><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala" target="_blank">TagScoring.scala</a><br /><br />集計対象となる言語を第1引数として必ず指定してください（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L25" target="_blank">25行目</a>）。<br /><br />集計の基準となる時刻は、引数で指定できるようになっています（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L28" target="_blank">28行目</a>）。<br />指定フォーマットは <code>"yyyyMMddHH"</code> で、指定しなかった場合のデフォルトは起動時刻の0分となります。<br /><br />MapReduceジョブでこれらを取得できるように設定しておきます（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L38" target="_blank">38行目</a>）。<br /><br />この時刻から、過去24時間が集計対象となります（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L46" target="_blank">46行目</a>）。<br /><br />集計元が<a href="http://happy-camper.st/development/cminst/coming-on-stream-3.html">前回</a>の転置テーブルになるので、転置処理が終わっているかどうかの確認処理なども入れています（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L58" target="_blank">58行目</a>）。<br /><br /><h3><code>TagScoringMapper</code></h3><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala" target="_blank">TagScoringMapper.scala</a><br /><br />処理の前に、先程送り込んだ計算に必要な設定を取得しておきます（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L27" target="_blank">27行目</a>）。<br /><br /><code>map</code>処理では、各時間枠ごとのツイート数をカウントして（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L35" target="_blank">35行目</a>）、減衰係数をかけながら加算していき（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L41" target="_blank">41行目</a>）、最後にペナルティを掛けます（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L45" target="_blank">45行目</a>）、と。<br /><br /><code>languages</code>テーブルは、基準となる時間に何回ツイートがあったがを保存しつつ、集計が終わったことを表します。<br /><br /><h3>TweetHotTag</h3><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TweetHotTag.scala" target="_blank">TweetHotTag.scala</a><br /><br />集計したスコアの高い順に100個のタグを出力します。<br />言語（必須）と時刻（任意：デフォルトは現在時刻0分）を指定します。<br /><br />クラス名が<code>Tweet〜〜</code>になっているのは（中略）OAuthに移行した<strike>せい</strike>からです。<br /><br /><h2>実行</h2>それでは実行してみます。<br /><br /><pre><code>$ sh target/appassembler/bin/scoring-tag ja
 $ sh target/appassembler/bin/tweet-hottag ja
 #aclive 6.693075460306 : count = Map(0 -&gt; 8, 1 -&gt; 4, 2 -&gt; 13, 3 -&gt; 9, 4 -&gt; 15, 5 -&gt; 1)
 #gmentalk       5.316292117147331 : count = Map(0 -&gt; 6, 1 -&gt; 4, 3 -&gt; 1)
@@ -275,7 +277,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     </div>
 </div>
 <div class="widget-calendar widget">
-    <h3 class="widget-header">2012年9月</h3>
+    <h3 class="widget-header">2013年10月</h3>
     <div class="widget-content">
         <table summary="リンク付きのカレンダー">
             <tr>
@@ -310,48 +312,12 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
                     1
         
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -391,7 +357,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -421,11 +391,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -465,7 +431,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -495,11 +465,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -539,7 +505,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -569,11 +539,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -613,7 +579,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -643,11 +613,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -662,31 +628,9 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
+                    31
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
                 </td>
         
     
@@ -791,14 +735,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
             </li>
         
-    
-        
-        
-            <li><a href="http://happy-camper.st/lang/java/guice/">Guice (2)</a>
-        
-        
-            </li>
-        
         </ul>
         
     
@@ -856,7 +792,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
         
         
-            <li><a href="http://happy-camper.st/idea/">ネタ (3)</a>
+            <li><a href="http://happy-camper.st/idea/">ネタ (2)</a>
         
         
         
@@ -871,14 +807,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
         
             <li><a href="http://happy-camper.st/idea/development/cminst/">cminst (5)</a>
-        
-        
-            </li>
-        
-    
-        
-        
-            <li><a href="http://happy-camper.st/idea/development/siphon/">Siphon (2)</a>
         
         
             </li>
@@ -987,11 +915,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
     
         
-            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (11)</a></li>
+            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (8)</a></li>
         
     
         
-            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (14)</a></li>
+            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (13)</a></li>
         
     
         

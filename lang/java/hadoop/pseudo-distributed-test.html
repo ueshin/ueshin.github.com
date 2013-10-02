@@ -102,11 +102,17 @@
 
 
                                     <div id="more" class="asset-more">
-                                        <h2>hadoop-aggregate</h2>まずは標準的なJava版の動作確認です。<br /><br />以前作成したものは、ローカルでなければ実行できない状態でしたので、若干の修正を加えてあります。(<a href="http://hadoop.happy-camper.st/changeset?new=trunk/hadoop-aggregate%4057&amp;old=trunk/hadoop-aggregate%4025" target="_blank">diff</a>)<br /><br /><pre><code>$ svn checkout checkout https://happy-camper.st/svn/hadoop/tags/hadoop-aggregate-0.20.2 hadoop-aggregate</code></pre><br />でチェックアウトできます。<br /><br />また <a href="http://hadoop.happy-camper.st/browser/tags/hadoop-aggregate-0.20.2" target="_blank">http://hadoop.happy-camper.st/browser/tags/hadoop-aggregate-0.20.2</a> でブラウズできます。<br /><br />また、Hadoopに接続するための設定を追加してあります。<br /><br /><ul><li><a href="http://hadoop.happy-camper.st/browser/tags/hadoop-aggregate-0.20.2/src/pseudo/resources/core-site.xml" target="_blank">core-site.xml</a></li><li><a href="http://hadoop.happy-camper.st/browser/tags/hadoop-aggregate-0.20.2/src/pseudo/resources/hdfs-site.xml" target="_blank">hdfs-site.xml</a></li><li><a href="http://hadoop.happy-camper.st/browser/tags/hadoop-aggregate-0.20.2/src/pseudo/resources/mapred-site.xml" target="_blank">mapred-site.xml</a></li></ul><br /><h3>実行</h3>このプログラムは、外部ライブラリ commons-lang-2.4.jar を利用しているので、クラスパスを設定する必要があります。<br /><br /><code>${HADOOP_HOME}/lib</code>にjarファイルを設置するか、 <code>${HADOOP_HOME}/conf/hadoop-env.sh</code>ファイル内 <code>HADOOP_CLASSPATH</code>変数に jarファイルへのパスを追加してください。<br /><br />準備ができたらHadoopを起動します。<br /><br /><pre><code>$ sudo su - hadoop
+                                        <h2>hadoop-aggregate</h2>まずは標準的なJava版の動作確認です。<br /><br />以前作成したものは、ローカルでなければ実行できない状態でしたので、若干の修正を加えてあります。(<a href="https://github.com/ueshin/hadoop-aggregate/commit/4e77a01ff26d002482cd1d26d3da483d2083dea6#diff-600376dffeb79835ede4a0b285078036" target="_blank">diff</a>)<br /><br /><pre><code>$ git clone https://github.com/ueshin/hadoop-aggregate.git
+$ cd hadoop-aggregate
+$ git checkout hadoop-aggregate-0.20.2</code></pre><br />でチェックアウトできます。<br /><br />また <a href="https://github.com/ueshin/hadoop-aggregate/tree/hadoop-aggregate-0.20.2" target="_blank">https://github.com/ueshin/hadoop-aggregate/tree/hadoop-aggregate-0.20.2</a> でブラウズできます。<br /><br />また、Hadoopに接続するための設定を追加してあります。<br /><br /><ul><li><a href="https://github.com/ueshin/hadoop-aggregate/blob/hadoop-aggregate-0.20.2/src/pseudo/resources/core-site.xml" target="_blank">core-site.xml</a></li><li><a href="https://github.com/ueshin/hadoop-aggregate/blob/hadoop-aggregate-0.20.2/src/pseudo/resources/hdfs-site.xml" target="_blank">hdfs-site.xml</a></li><li><a href="https://github.com/ueshin/hadoop-aggregate/blob/hadoop-aggregate-0.20.2/src/pseudo/resources/mapred-site.xml" target="_blank">mapred-site.xml</a></li></ul><br /><h3>実行</h3>このプログラムは、外部ライブラリ commons-lang-2.4.jar を利用しているので、クラスパスを設定する必要があります。<br /><br /><code>${HADOOP_HOME}/lib</code>にjarファイルを設置するか、 <code>${HADOOP_HOME}/conf/hadoop-env.sh</code>ファイル内 <code>HADOOP_CLASSPATH</code>変数に jarファイルへのパスを追加してください。<br /><br />準備ができたらHadoopを起動します。<br /><br /><pre><code>$ sudo su - hadoop
 $ ${HADOOP_HOME}/bin/start-all.sh</code></pre><br />HDFSへファイルをput<br /><br /><pre><code>$ ${HADOOP_HOME}/bin/hadoop fs -put test/resources</code> input</pre><br />プログラムの実行<br /><br /><pre><code>$ mvn -P pseudo clean package
-$ sh target/appassembler/bin/aggregator input output</code></pre><br />結果確認<br /><br /><pre><code>$ ${HADOOP_HOME}/bin/hadoop fs -cat output/part-r-00000</code></pre><br />以前のものと同じ結果が表示されたと思います。<br /><br /><h2>hadoop-scala-aggregate</h2>次にScala版。<br />こちらも、分散環境向けに修正をしてあります。 (<a href="http://hadoop.happy-camper.st/changeset?new=trunk/hadoop-scala-aggregate%4049&amp;old=trunk/hadoop-scala-aggregate%4030" target="_blank">diff</a>)<br /><br /><pre><code>$ svn checkout checkout https://happy-camper.st/svn/hadoop/tags/hadoop-scala-aggregate-0.20.2 hadoop-scala-aggregate</code></pre><br />でチェックアウトできます。<br /><br />また <a href="http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.2" target="_blank">http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.2</a> でブラウズできます。<br /><br />また、Hadoopに接続するための設定を追加してあります。<br /><br /><ul><li><a href="http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.2/src/pseudo/resources/core-site.xml" target="_blank">core-site.xml</a></li><li><a href="http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.2/src/pseudo/resources/hdfs-site.xml" target="_blank">hdfs-site.xml</a></li><li><a href="http://hadoop.happy-camper.st/browser/tags/hadoop-scala-aggregate-0.20.2/src/pseudo/resources/mapred-site.xml" target="_blank">mapred-site.xml</a></li></ul><br /><h3>実行</h3>先程の結果ディレクトリは削除もしくはリネームしておいてください。<br /><br />それでは実行してみます。<br /><br /><pre><code>$ mvn -P pseudo clean package
+$ sh target/appassembler/bin/aggregator input output</code></pre><br />結果確認<br /><br /><pre><code>$ ${HADOOP_HOME}/bin/hadoop fs -cat output/part-r-00000</code></pre><br />以前のものと同じ結果が表示されたと思います。<br /><br /><h2>hadoop-scala-aggregate</h2>次にScala版。<br />こちらも、分散環境向けに修正をしてあります。 (<a href="https://github.com/ueshin/hadoop-scala-aggregate/commit/1708f78b994665471b965060579397ea19a25efe" target="_blank">diff</a>)<br /><br /><pre><code>$ git clone https://github.com/ueshin/hadoop-scala-aggregate.git
+$ cd hadoop-scala-aggregate
+$ git checkout hadoop-scala-aggregate-0.20.2</code></pre><br />でチェックアウトできます。<br /><br />また <a href="https://github.com/ueshin/hadoop-scala-aggregate/tree/hadoop-scala-aggregate-0.20.2" target="_blank">https://github.com/ueshin/hadoop-scala-aggregate/tree/hadoop-scala-aggregate-0.20.2</a> でブラウズできます。<br /><br />また、Hadoopに接続するための設定を追加してあります。<br /><br /><ul><li><a href="https://github.com/ueshin/hadoop-scala-aggregate/blob/hadoop-scala-aggregate-0.20.2/src/pseudo/resources/core-site.xml" target="_blank">core-site.xml</a></li><li><a href="https://github.com/ueshin/hadoop-scala-aggregate/blob/hadoop-scala-aggregate-0.20.2/src/pseudo/resources/hdfs-site.xml" target="_blank">hdfs-site.xml</a></li><li><a href="https://github.com/ueshin/hadoop-scala-aggregate/blob/hadoop-scala-aggregate-0.20.2/src/pseudo/resources/mapred-site.xml" target="_blank">mapred-site.xml</a></li></ul><br /><h3>実行</h3>先程の結果ディレクトリは削除もしくはリネームしておいてください。<br /><br />それでは実行してみます。<br /><br /><pre><code>$ mvn -P pseudo clean package
 $ sh target/appassembler/bin/aggregator input output
-$ ${HADOOP_HOME}/bin/hadoop fs -cat output/part-r-00000</code></pre><br /><h2>pig-scala-aggregate</h2>最後にPigを実行してみます。<br /><br />ローカルで実行するよう実装されていましたので、若干の修正を加えてあります。(<a href="http://hadoop.happy-camper.st/changeset?new=trunk/pig-scala-aggregate%4050&amp;old=trunk/pig-scala-aggregate%4048" target="_blank">diff</a>)<br />プログラムへの第1引数を<code>local</code>/<code>mapred</code>モードの切替として指定します。<br /><br /><pre><code>$ svn checkout checkout https://happy-camper.st/svn/hadoop/tags/pig-scala-aggregate-0.6.2 pig-scala-aggregate</code></pre><br />でチェックアウトできます。<br /><br />また <a href="http://hadoop.happy-camper.st/browser/tags/pig-scala-aggregate-0.6.2" target="_blank">http://hadoop.happy-camper.st/browser/tags/pig-scala-aggregate-0.6.2</a> でブラウズできます。<br /><br />また、Embedded Pigで Hadoopに接続するための設定を追加してあります。<br />（Pig Latinスクリプトの実行時にはこの設定は必要ありません。）<br /><br /><ul><li><a href="http://hadoop.happy-camper.st/browser/tags/pig-scala-aggregate-0.6.2/src/main/resources/core-site.xml" target="_blank">core-site.xml</a></li><li><a href="http://hadoop.happy-camper.st/browser/tags/pig-scala-aggregate-0.6.2/src/main/resources/hdfs-site.xml" target="_blank">hdfs-site.xml</a></li><li><a href="http://hadoop.happy-camper.st/browser/tags/pig-scala-aggregate-0.6.2/src/main/resources/mapred-site.xml" target="_blank">mapred-site.xml</a></li></ul><br />もしくは、以下で説明する<code>pig.properties</code>を<code>resources</code>に設置しても動作します。<br />Embedded Pigの場合には、<code>pig.properties</code>ファイルの方がいいかもしれません。<br /><br /><h3>Embedded Pigの実行</h3>まずはEmbedded Pigを実行してみます。<br /><br /><pre><code>$ mvn clean package
+$ ${HADOOP_HOME}/bin/hadoop fs -cat output/part-r-00000</code></pre><br /><h2>pig-scala-aggregate</h2>最後にPigを実行してみます。<br /><br />ローカルで実行するよう実装されていましたので、若干の修正を加えてあります。(<a href="https://github.com/ueshin/pig-scala-aggregate/commit/54a1dab587431e3b97003deb15d2f5bafc214107" target="_blank">diff</a>)<br />プログラムへの第1引数を<code>local</code>/<code>mapred</code>モードの切替として指定します。<br /><br /><pre><code>$ git clone https://github.com/ueshin/pig-scala-aggregate.git
+$ cd pig-scala-aggregate
+$ git checkout pig-scala-aggregate-0.6.2</code></pre><br />でチェックアウトできます。<br /><br />また <a href="https://github.com/ueshin/pig-scala-aggregate/tree/pig-scala-aggregate-0.6.2" target="_blank">https://github.com/ueshin/pig-scala-aggregate/tree/pig-scala-aggregate-0.6.2</a> でブラウズできます。<br /><br />また、Embedded Pigで Hadoopに接続するための設定を追加してあります。<br />（Pig Latinスクリプトの実行時にはこの設定は必要ありません。）<br /><br /><ul><li><a href="https://github.com/ueshin/pig-scala-aggregate/blob/pig-scala-aggregate-0.6.2/src/main/resources/core-site.xml" target="_blank">core-site.xml</a></li><li><a href="https://github.com/ueshin/pig-scala-aggregate/blob/pig-scala-aggregate-0.6.2/src/main/resources/hdfs-site.xml" target="_blank">hdfs-site.xml</a></li><li><a href="https://github.com/ueshin/pig-scala-aggregate/blob/pig-scala-aggregate-0.6.2/src/main/resources/mapred-site.xml" target="_blank">mapred-site.xml</a></li></ul><br />もしくは、以下で説明する<code>pig.properties</code>を<code>resources</code>に設置しても動作します。<br />Embedded Pigの場合には、<code>pig.properties</code>ファイルの方がいいかもしれません。<br /><br /><h3>Embedded Pigの実行</h3>まずはEmbedded Pigを実行してみます。<br /><br /><pre><code>$ mvn clean package
 $ sh target/appassembler/bin/aggregator mapred input output
 $ ${HADOOP_HOME}/bin/hadoop fs -cat output/part-00000</code></pre><br /><h3>Pig Latinスクリプトの実行</h3>Pig Latinスクリプトを実行するには、Hadoopへ接続するための設定をする必要があります。<br /><br />スクリプト実行をHadoopクラスタ内から実行する場合には、<code>${PIG_HOME}/conf/pig-env.sh</code>ファイル内<code>PIG_CLASSPATH</code>変数に<code>${HADOOP_HOME}/conf</code>ディレクトリを追加してください。<br /><br /><pre><code>PIG_CLASSPATH=${HADOOP_HOME}/conf:/opt/local/share/scala-2.8/lib/scala-library.jar</code></pre><br />クラスタ外から実行する場合には、<code>fs.default.name</code>を設定した<code>core-site.xml</code>ファイルと<code>mapred.job.tracker</code>を設定した<code>mapred-site.xml</code>を<code>${PIG_HOME}/conf</code>ディレクトリに設置するか、もしくは<code>${PIG_HOME}/conf/pig.properties</code>ファイルで設定することもできます。<br /><br /><pre><code>fs.default.name=hdfs://localhost:9000
 mapred.job.tracker=localhost:9001</code></pre><br />それでは実行してみます。<br /><br /><pre><code>$ mvn clean package
@@ -240,7 +246,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     </div>
 </div>
 <div class="widget-calendar widget">
-    <h3 class="widget-header">2012年9月</h3>
+    <h3 class="widget-header">2013年10月</h3>
     <div class="widget-content">
         <table summary="リンク付きのカレンダー">
             <tr>
@@ -275,48 +281,12 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
                     1
         
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -356,7 +326,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -386,11 +360,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -430,7 +400,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -460,11 +434,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -504,7 +474,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -534,11 +508,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -578,7 +548,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -608,11 +582,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -627,31 +597,9 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
+                    31
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
                 </td>
         
     
@@ -756,14 +704,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
             </li>
         
-    
-        
-        
-            <li><a href="http://happy-camper.st/lang/java/guice/">Guice (2)</a>
-        
-        
-            </li>
-        
         </ul>
         
     
@@ -821,7 +761,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
         
         
-            <li><a href="http://happy-camper.st/idea/">ネタ (3)</a>
+            <li><a href="http://happy-camper.st/idea/">ネタ (2)</a>
         
         
         
@@ -836,14 +776,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
         
             <li><a href="http://happy-camper.st/idea/development/cminst/">cminst (5)</a>
-        
-        
-            </li>
-        
-    
-        
-        
-            <li><a href="http://happy-camper.st/idea/development/siphon/">Siphon (2)</a>
         
         
             </li>
@@ -952,11 +884,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
     
         
-            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (11)</a></li>
+            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (8)</a></li>
         
     
         
-            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (14)</a></li>
+            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (13)</a></li>
         
     
         

@@ -97,21 +97,23 @@
                                 <div class="asset-content entry-content">
 
                                     <div class="asset-body">
-                                        Coming on Streamシリーズ ファーストシーズン最終回。<br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-1.html">その1</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-2.html">その2</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-3.html">その3</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-4.html">その4</a><br /><br />最終回として、今回もろもろ利用したScala的な何かについてつらつらと書きます。<br /><br />今回利用するプログラムも、<br /><br /><pre><code>$ svn checkout https://happy-camper.st/svn/hadoop/tags/hbase-twitter-0.0.2 hbase-twitter</code></pre><br />を利用します。<br /><br />また <a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2" target="_blank">http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2</a>でブラウズできます。<br /><br />
+                                        Coming on Streamシリーズ ファーストシーズン最終回。<br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-1.html">その1</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-2.html">その2</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-3.html">その3</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-4.html">その4</a><br /><br />最終回として、今回もろもろ利用したScala的な何かについてつらつらと書きます。<br /><br />今回利用するプログラムも、<br /><br /><pre><code>$ git clone https://github.com/ueshin/hbase-twitter.git
+$ cd hbase-twitter
+$ git checkout hbase-twitter-0.0.2</code></pre><br />を利用します。<br /><br />また <a href="https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.2" target="_blank">https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.2</a>でブラウズできます。<br /><br />
                                     </div>
 
 
                                     <div id="more" class="asset-more">
-                                        <h2>便利に利用したScalaの機能</h2>まずは便利に利用したScalaの機能もろもろについて。<br /><br /><h3><code>package object</code></h3>プロジェクト内でよく利用する共通処理をプロジェクトのトップパッケージにパッケージオブジェクトで置いておくと便利です。<br /><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/package.scala" target="_blank">package.scala</a><br /><br />サブパッケージのクラスでこれらを参照する場合には、<br /><br /><pre><code>package st.happy_camper.hbase.twitter
-package subpackage</code></pre><br />のようなパッケージ宣言にしておけば利用可能になります。<br /><br />パッケージ内のみで利用するものも、それぞれのパッケージオブジェクトで書いておくと便利です。<br /><br /><h3><code>implicit conversion</code></h3>HBaseではほとんどのデータをバイト配列で保持します。<br />この時、Javaだとバイト配列への変換もすべて書かなければなりません。<br />そのため <code>Bytes.toBytes()</code> というメソッド呼び出しを繰り返し記述する必要があります。<br /><br />そこで、必要な変換を <code>implicit conversion</code> すると便利です。<br /><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/package.scala" target="_blank">package.scala</a> 9-14行目<br /><br />例えば、 <a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TweetHotTag.scala">TweetHotTag.scala</a> の35行目 <code>new HTable()</code> の第2引数や、 37行目 <code>new Scan().addColumn()</code> の各引数などは全てバイト配列なのですが、<code>implicit conversion</code>のおかげですっきりと記述出来ています。<br /><br />Before<br /><br /><pre><code>new Scan().addColumn(Bytes.toBytes("score_" + lang), Bytes.toBytes(TagScoring.dateFormat.format(target)))</code></pre><br /><br />After<br /><br /><pre><code>new Scan().addColumn("score_" + lang, TagScoring.dateFormat.format(target))</code></pre><br /><h2>クロージャによる新構文</h2>Scalaでは、クロージャを利用することで新構文を作成できます。<br />正確には<code>implicit conversion</code>とかただのメソッド呼び出しがそれっぽく見えるように記述できるってことなんですが。<br /><br />今回作成したのは、使い終わったら<code>close()</code>を呼び出す必要があるものを、自動的に<code>close()</code>してくれる構文です。<br /><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/package.scala" target="_blank">package.scala</a> 16-26行目<br /><br />この<code>EnsureClose</code>クラスと<code>implicit</code>な<code>ensureClose</code>メソッドにより、<code>close()</code> メソッドを持つオブジェクトを、処理を記述したクロージャを引数にして<code>open()</code>すると、処理した後に<code>close()</code>してくれます。<br /><br />例えば、<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TweetHotTag.scala">TweetHotTag.scala</a> の35行目<br /><br /><pre><code>new HTable(conf, "tagtrend").open {
+                                        <h2>便利に利用したScalaの機能</h2>まずは便利に利用したScalaの機能もろもろについて。<br /><br /><h3><code>package object</code></h3>プロジェクト内でよく利用する共通処理をプロジェクトのトップパッケージにパッケージオブジェクトで置いておくと便利です。<br /><br /><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/package.scala" target="_blank">package.scala</a><br /><br />サブパッケージのクラスでこれらを参照する場合には、<br /><br /><pre><code>package st.happy_camper.hbase.twitter
+package subpackage</code></pre><br />のようなパッケージ宣言にしておけば利用可能になります。<br /><br />パッケージ内のみで利用するものも、それぞれのパッケージオブジェクトで書いておくと便利です。<br /><br /><h3><code>implicit conversion</code></h3>HBaseではほとんどのデータをバイト配列で保持します。<br />この時、Javaだとバイト配列への変換もすべて書かなければなりません。<br />そのため <code>Bytes.toBytes()</code> というメソッド呼び出しを繰り返し記述する必要があります。<br /><br />そこで、必要な変換を <code>implicit conversion</code> すると便利です。<br /><br /><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/package.scala#L9-L14" target="_blank">package.scala</a> 9-14行目<br /><br />例えば、 <a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TweetHotTag.scala#L35" target="_blank">TweetHotTag.scala</a> の35行目 <code>new HTable()</code> の第2引数や、 37行目 <code>new Scan().addColumn()</code> の各引数などは全てバイト配列なのですが、<code>implicit conversion</code>のおかげですっきりと記述出来ています。<br /><br />Before<br /><br /><pre><code>new Scan().addColumn(Bytes.toBytes("score_" + lang), Bytes.toBytes(TagScoring.dateFormat.format(target)))</code></pre><br /><br />After<br /><br /><pre><code>new Scan().addColumn("score_" + lang, TagScoring.dateFormat.format(target))</code></pre><br /><h2>クロージャによる新構文</h2>Scalaでは、クロージャを利用することで新構文を作成できます。<br />正確には<code>implicit conversion</code>とかただのメソッド呼び出しがそれっぽく見えるように記述できるってことなんですが。<br /><br />今回作成したのは、使い終わったら<code>close()</code>を呼び出す必要があるものを、自動的に<code>close()</code>してくれる構文です。<br /><br /><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/package.scala#L16-L26" target="_blank">package.scala</a> 16-26行目<br /><br />この<code>EnsureClose</code>クラスと<code>implicit</code>な<code>ensureClose</code>メソッドにより、<code>close()</code> メソッドを持つオブジェクトを、処理を記述したクロージャを引数にして<code>open()</code>すると、処理した後に<code>close()</code>してくれます。<br /><br />例えば、<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TweetHotTag.scala#L35" target="_blank">TweetHotTag.scala</a> の35行目<br /><br /><pre><code>new HTable(conf, "tagtrend").open {
   case tagtrend: HTable =&gt; ... 
 }</code></pre><br />や、38行目の<br /><br /><pre><code>tagtrend.getScanner(new Scan() ... ).open {
   case scanner: ResultScanner =&gt; ...
-}</code></pre><br />のように書けます。<br />ここを <code>try { ... } finally { close() }</code> で記述するとものすごく冗長に見えます。<br /><br />と、これを書いている間に上記のクロージャの引数となる部分の、<code>case</code>と型を記述しなくてもいいようになる方法を思いつきましたが、それはまたの機会に。<br /><br /><h3><code>unapply</code>メソッド</h3>メソッド名を省略できる<code>apply</code>メソッドもかなり便利ですが、Scalaの強力なパターンマッチで暗黙的に利用されるメソッドである<code>unapply</code>メソッドを利用することで便利なことが多いです。<br /><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/entity/Status.scala">Status.scala</a> 40-47行目<br /><br /><code>Node</code>オブジェクトから<code>Option[Status]</code>オブジェクトを返すメソッドです。<br />パターンマッチで使えば、引数に指定した変数に<code>Status</code>オブジェクトが代入されます（<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/handler/HTableHandler.scala#L19">HTableHandler.scala 19行目</a>）。<br /><br /><pre><code>XML.loadString(xml) match {
+}</code></pre><br />のように書けます。<br />ここを <code>try { ... } finally { close() }</code> で記述するとものすごく冗長に見えます。<br /><br />と、これを書いている間に上記のクロージャの引数となる部分の、<code>case</code>と型を記述しなくてもいいようになる方法を思いつきましたが、それはまたの機会に。<br /><br /><h3><code>unapply</code>メソッド</h3>メソッド名を省略できる<code>apply</code>メソッドもかなり便利ですが、Scalaの強力なパターンマッチで暗黙的に利用されるメソッドである<code>unapply</code>メソッドを利用することで便利なことが多いです。<br /><br /><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/entity/Status.scala#L40-L47" target="_blank">Status.scala</a> 40-47行目<br /><br /><code>Node</code>オブジェクトから<code>Option[Status]</code>オブジェクトを返すメソッドです。<br />パターンマッチで使えば、引数に指定した変数に<code>Status</code>オブジェクトが代入されます（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/handler/HTableHandler.scala#L19" target="_blank">HTableHandler.scala 19行目</a>）。<br /><br /><pre><code>XML.loadString(xml) match {
   case Status(status) =&gt; ...
   case Delete(delete) =&gt; ...
   case _ =&gt; ...
-}</code></pre><br /><br /><a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/io/ScoreWritable.scala">ScoreWritable.scala</a> 34-43行目<br /><br />こちらはバイト配列から<code>Option[Score]</code>オブジェクトを返すメソッドですが、この<code>unapply</code>メソッドは変数の代入時にも使えるので、例えば（<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TweetHotTag.scala#L42">TweetHotTag.scala 42行目</a>）<br /><br /><pre><code>val ScoreWritable(score) = result.value</code></pre><br />のように、バイト配列から<code>score</code>変数に<code>Score</code>オブジェクトをさくっと代入できてしまいます。<br />ただし、<code>unapply</code>メソッドが<code>None</code>を返したら例外飛ぶので注意。<br /><br /><h2>面倒だったところ</h2>Eclipseのプラグインがちゃんと動かないのは置いといて。<br /><br /><h3>型引数が厳密<br /></h3>Javaよりも型引数を厳密に記述しなければならない場合があります。<br /><br />例えば（<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L50">TagScoring.scala 50行目</a>）、<br /><br /><pre><code>classOf[HRegionPartitioner[ImmutableBytesWritable, Put]]</code></pre><br />Javaだと <code>HRegionPartitioner.class</code> だけです。<br /><br /><br />また、前のバージョンですが（<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/LangCounter.scala">LangCounter.scala 25行目</a>）、<br /><br /><pre><code>type Context = Mapper[ImmutableBytesWritable, Result, Text, LongWritable]#Context</code></pre><br />のように、ジェネリクスな親クラスの内部クラスの型を指定するときに、親クラスの型引数込みで内部クラスを指定しなければならない場合があります。<br /><br />※ これってなんでですかね？ ご存じの方、教えてください。<br />※ もっと簡潔に書けるよっていう方法があれば、そちらでも。ｗ<br /><br /><h3>Java併用時</h3>デフォルトで<code>import</code>されるクラス名をScala側のクラスが上書きしてしまうとコンパイルエラーが分かりにくくなります。<br /><br />例えば（<a href="http://hadoop.happy-camper.st/browser/tags/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/CountReducer.scala#L12">CountReducer.scala 12行目</a>）、<br /><br /><pre><code>override def reduce(key: Text, values: java.lang.Iterable[LongWritable], context: Context)</code></pre><br />の第2引数の型を <code>Iterable[LongWritable]</code> だけで指定するとコンパイルエラーになります。<br /><br />あと <code>Integer.parseInt("1")</code> はいけるけど <code>Long.parseLong("1")</code> はいけないとか。<br /><br /><code>java.lang</code>パッケージはデフォルトでは<code>import</code>しなくてもよかったんじゃなかろうか（そしたらJava側のクラスを使うときには常に気を使うようになる気がする）。<br />もしくは名前をカブらせるのやめて欲しかった（<code>String</code>みたいにできなかったのかなとか）。<br /><br /><h3>Scaladocわかりにくい</h3>慣れ？<br /><br /><br />などなど、いろいろありましたとさ。<br />他にもあったかもしれないけど、思い出したら追記していきます。<br /><br />
+}</code></pre><br /><br /><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/io/ScoreWritable.scala#L34-L43" target="_blank">ScoreWritable.scala</a> 34-43行目<br /><br />こちらはバイト配列から<code>Option[Score]</code>オブジェクトを返すメソッドですが、この<code>unapply</code>メソッドは変数の代入時にも使えるので、例えば（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TweetHotTag.scala#L42" target="_blank">TweetHotTag.scala 42行目</a>）<br /><br /><pre><code>val ScoreWritable(score) = result.value</code></pre><br />のように、バイト配列から<code>score</code>変数に<code>Score</code>オブジェクトをさくっと代入できてしまいます。<br />ただし、<code>unapply</code>メソッドが<code>None</code>を返したら例外飛ぶので注意。<br /><br /><h2>面倒だったところ</h2>Eclipseのプラグインがちゃんと動かないのは置いといて。<br /><br /><h3>型引数が厳密<br /></h3>Javaよりも型引数を厳密に記述しなければならない場合があります。<br /><br />例えば（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L50" target="_blank">TagScoring.scala 50行目</a>）、<br /><br /><pre><code>classOf[HRegionPartitioner[ImmutableBytesWritable, Put]]</code></pre><br />Javaだと <code>HRegionPartitioner.class</code> だけです。<br /><br /><br />また、前のバージョンですが（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/LangCounter.scala#L25" target="_blank">LangCounter.scala 25行目</a>）、<br /><br /><pre><code>type Context = Mapper[ImmutableBytesWritable, Result, Text, LongWritable]#Context</code></pre><br />のように、ジェネリクスな親クラスの内部クラスの型を指定するときに、親クラスの型引数込みで内部クラスを指定しなければならない場合があります。<br /><br />※ これってなんでですかね？ ご存じの方、教えてください。<br />※ もっと簡潔に書けるよっていう方法があれば、そちらでも。ｗ<br /><br /><h3>Java併用時</h3>デフォルトで<code>import</code>されるクラス名をScala側のクラスが上書きしてしまうとコンパイルエラーが分かりにくくなります。<br /><br />例えば（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/CountReducer.scala#L12" target="_blank">CountReducer.scala 12行目</a>）、<br /><br /><pre><code>override def reduce(key: Text, values: java.lang.Iterable[LongWritable], context: Context)</code></pre><br />の第2引数の型を <code>Iterable[LongWritable]</code> だけで指定するとコンパイルエラーになります。<br /><br />あと <code>Integer.parseInt("1")</code> はいけるけど <code>Long.parseLong("1")</code> はいけないとか。<br /><br /><code>java.lang</code>パッケージはデフォルトでは<code>import</code>しなくてもよかったんじゃなかろうか（そしたらJava側のクラスを使うときには常に気を使うようになる気がする）。<br />もしくは名前をカブらせるのやめて欲しかった（<code>String</code>みたいにできなかったのかなとか）。<br /><br /><h3>Scaladocわかりにくい</h3>慣れ？<br /><br /><br />などなど、いろいろありましたとさ。<br />他にもあったかもしれないけど、思い出したら追記していきます。<br /><br />
                                     </div>
 
                                 </div>
@@ -240,7 +242,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     </div>
 </div>
 <div class="widget-calendar widget">
-    <h3 class="widget-header">2012年9月</h3>
+    <h3 class="widget-header">2013年10月</h3>
     <div class="widget-content">
         <table summary="リンク付きのカレンダー">
             <tr>
@@ -275,48 +277,12 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
                     1
         
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -356,7 +322,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -386,11 +356,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -430,7 +396,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -460,11 +430,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -504,7 +470,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -534,11 +504,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -578,7 +544,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
+            </tr>
+        
     
+        
+            <tr>
         
                 <td>
         
@@ -608,11 +578,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
                 </td>
         
-            </tr>
-        
     
-        
-            <tr>
         
                 <td>
         
@@ -627,31 +593,9 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
                 <td>
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
+                    31
         
         
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
-                </td>
-        
-    
-        
-                <td>
-        
-        
-        &nbsp;
                 </td>
         
     
@@ -756,14 +700,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
             </li>
         
-    
-        
-        
-            <li><a href="http://happy-camper.st/lang/java/guice/">Guice (2)</a>
-        
-        
-            </li>
-        
         </ul>
         
     
@@ -821,7 +757,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     
         
         
-            <li><a href="http://happy-camper.st/idea/">ネタ (3)</a>
+            <li><a href="http://happy-camper.st/idea/">ネタ (2)</a>
         
         
         
@@ -836,14 +772,6 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
         
             <li><a href="http://happy-camper.st/idea/development/cminst/">cminst (5)</a>
-        
-        
-            </li>
-        
-    
-        
-        
-            <li><a href="http://happy-camper.st/idea/development/siphon/">Siphon (2)</a>
         
         
             </li>
@@ -952,11 +880,11 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
         
     
         
-            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (11)</a></li>
+            <li><a href="http://happy-camper.st/2008/10/">2008年10月 (8)</a></li>
         
     
         
-            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (14)</a></li>
+            <li><a href="http://happy-camper.st/2008/09/">2008年9月 (13)</a></li>
         
     
         
