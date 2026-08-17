@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <title>Happy-Camper Street</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/" />
-    <link rel="self" type="application/atom+xml" href="http://happy-camper.st/atom.xml" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/" />
+    <link rel="self" type="application/atom+xml" href="https://happy-camper.st/atom.xml" />
     <id>tag:happy-camper.st,2012-09-06://2</id>
     <updated>2012-09-05T16:31:24Z</updated>
     <subtitle>とあるフリープログラマの頭ん中。</subtitle>
@@ -10,7 +10,7 @@
 
 <entry>
     <title>HBaseのコンパクションまわりを調べてみた件。</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/lang/java/hbase/togetter-hbase-compaction.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/lang/java/hbase/togetter-hbase-compaction.html" />
     <id>tag:happy-camper.st,2011://2.59</id>
 
     <published>2011-09-04T16:01:49Z</published>
@@ -19,13 +19,13 @@
     <summary>せっかくまとめたのでこちらにも貼っておきます。...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="HBase" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
         せっかくまとめたのでこちらにも貼っておきます。
         <![CDATA[<h2>まとめのまとめ</h2>
 <h3>コンパクションのトリガー</h3>
@@ -59,7 +59,7 @@
 
 <entry>
     <title>HBaseワークショップ(第一回)</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/lang/java/hbase/workshop/hbase-workshop-20110520.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/lang/java/hbase/workshop/hbase-workshop-20110520.html" />
     <id>tag:happy-camper.st,2011://2.58</id>
 
     <published>2011-05-28T13:54:09Z</published>
@@ -68,22 +68,22 @@
     <summary>先日5月20日(金)にHBaseワークショップ(第一回)が開催されました。HBa...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="勉強会" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
         <![CDATA[先日5月20日(金)に<a href="http://www.zusaar.com/event/agZ6dXNhYXJyDAsSBUV2ZW50GJJXDA" target="_blank">HBaseワークショップ(第一回)</a>が開催されました。<br /><br />HBaseについて、メインの参加者間での情報交換を中心としたディスカッションを行いました。<br />周りの方々からも質問等があればいつでも声をかけていただき、話をふくらませていくスタイルでした。<br />このような会に参加させていただいたことを、心より感謝いたします。<br /><br />今回はこの勉強会の当日に、発言しておけばよかった、言葉足らずだった、後で思ったこと等をまとめておこうと思います。<br /><br />]]>
         <![CDATA[<h2>何に使っている・使いたいのか？</h2>Twitter Streamingからのデータの取り込みをしています。<br /><br />素人ながら、統計解析、機械学習や自然言語処理などの分野を勉強しようと思っていて、そのためのデータ収集をしています。<br />そのための基盤をHadoop MapReduceでやろうと思ったので、連携のしやすいHBaseを選択しました。<br /><br />現状ではデータ収集を安定して行えるような施策をしたり、次の集計などをうまく行うためのいろいろな設計を試しているところです。<br /><br /><h2>キーの設計</h2>HBaseをうまく使うためには、キーの設計は非常に大きなウェイトを占めます。<br />これまでTwitter Streamingの件でいろいろ試してみて思ったところは次のようなパターンです。<br /><br /><h3>画面等から参照する必要がある場合はPrefixで局所化</h3>WebUIなどの画面からデータ参照をするのであれば、参照する単位で局所化します。<br /><br />例えばTwitterであれば、基本的に各ユーザーのツイートを一覧で参照することになりますので、ユーザーIDをキーのPrefixとし、ステータスID(の逆順)もしくはタイムスタンプ(の逆順)をその後に置けば、各ユーザーのツイートを局所化して持つことができます。<br />場合によっては、2個目、3個目のPrefixを追加します。<br /><br />このようにすると、キー範囲指定のScanを使えるようになるので高速にデータにアクセスすることができます。<br /><br />注）「逆順」は、例えばLong.MAX_VALUEから引き算するなどした値を利用します。<br /><br /><h3>MapReduceの入力に使うならひたすら分散</h3>局所化の必要がなく、MapReduceの入力データとして利用するのであれば、ひたすら分散させます。<br />データを一意に特定できる何か、をハッシュしたりすると充分に分散できます。<br /><br />データ量が多くなることが予め分かっているのであれば、テーブル作成時にリージョン分割をすることをおすすめします。<br />キーにハッシュを利用するのであれば000・・・からfff・・・までの範囲に均等に配置されることが期待できるので、割り当て可能なMap数分程度に分割しておけばMapを適度に分散して処理することができます。<br /><br />
-<h3>特殊な場合<br /></h3>HBaseは、時系列、連番をキーとして扱うことが苦手なことが分かっています。<br /><br />キーが単調増加、もしくは単調減少すると、一番下、もしくは一番上のリージョンに書き込み負荷が集中することになります。<br /><br />1つのリージョンで充分に処理できる程度しか書き込みがない場合で、どうしても時間範囲、連番の範囲でScanする必要がある場合を除いては採用しないほうがいいと思います。<br /><br /><a href="https://github.com/sematext/HBaseWD" target="_blank">HBaseWD</a><br /><br />やむを得ず、かつ書き込みを多少でも分散したい、という場合には、<a href="https://github.com/sematext/HBaseWD" target="_blank">HBaseWD</a>というライブラリが利用できます。<br />これは、各キーにPrefixを付けてくれるライブラリです。<br /><br />例えば[0-f]をPrefixとして、順繰り、ランダム、などで付け、書き込み負荷を16個に分散します。<br />Scanの時には[0-f]のPrefixをつけた16個のScanを行います。<br /><br />良くも悪くもPrefixに利用する値の種類しか分散しませんので、他にいい方法があればそちらを採用すべきだと思います。<br /><br /><h2>カラムファミリーの使い方</h2><h3>論理的分類</h3>基本的には論理的分類によってカラムファミリーをわけます。<br />Twitter取り込みの最新の実装では status、user、place、user_mentions、urls、hashtags、delete となっています。<br /><br />論理的分類で分けるだけでも、それなりにアクセスパターンも分類できている印象です。<br /><br /><h3>tall table vs <strike>fat</strike> wide table</h3>tall table(縦長テーブル) vs <strike>fat</strike> wide table(横長テーブル) の議論がHBaseのMLでよく行われています。<br /><br />tall tableは、RDBのテーブルのように、ほぼ同じカラム数で行数が増えていく(縦に伸びる)テーブルで、<strike>fat</strike> wide tableは、qualifierを利用することで、カラム数が増えていく(横に伸びる)テーブルです。<br /><br />実は、初期のTwitter Streaming取り込みの実装では<strike>fat</strike> wide table方式を採用していました。<br />具体的には、キーにユーザーIDで、カラムファミリーstatusに対してqualifierにステータスIDを指定して、そのユーザーのツイートを同じ行内で横に入れていました。<br /><br /><strike>fat</strike> wide tableの利点は、1つのキーが指定出来れば、紐づくデータを一括で取れるところです。なので、キーの並びを気にせず、自由に分散することができます。(データの偏りは発生します)<br /><br />HBaseを使ったMapReduceへの入力は、キー毎にmapへ入力されます。<br /><strike>fat</strike> wide tableを使うと、mapに同じキーに紐づくデータを一気に投入できるので、reduceで行うような処理をmapで行うことができることがあります。<br />予めshuffleの結果と同等のテーブル設計にしておくと、多段に及ぶMapReduce処理の分岐、合流地点の受け皿としてかなり有用です。<br /><br />大きな問題点は、行の肥大化です。<br />特定の行が太りすぎてしまっても、その行が複数のリージョンに分割されることはありません。<br />また、mapへの入力時にメモリの問題にもなりかねません。<br /><br /><strike>fat</strike> wide tableはとても有用ですが、利用の際にはそのあたりの見積りも必要となります。<br /><br />（修正 2011/06/05: "fat table"という表現はあまり使われていないようなので、wide tableに改めました。）<br />（訂正 2011/06/14: "fat table"は、セルに大きなデータを持つようなテーブルのことを指すようです。大変失礼しました。）<br /><br /><h2>思うこと</h2>貧乏性な発想では、うまくいかない場合が多い。<br />元々大規模向けに作られているので、そのように発想の転換が必要。<br />（とかいうと個人でやってる身としてはツライですが。。。）<br /><br /><h2>おまけ</h2>雑談、飲み会の時に個人的にヒットした発言。<br /><br /><a href="http://twitter.com/ashigeru" target="_blank">@ashigeru</a>さん: 「データのダム」 -&gt; 「最悪テーブルごと入れ替える」<br /><a href="http://twitter.com/doryokujin" target="_blank">@doryokujin</a>さん: 「どこもがんばってるんですね。」<br /><br /><h2>反省</h2>もっと積極的に発言を。<br />話題提供のためにも、説明をスムーズにするためにも、資料を作っていく。<br /><br />というわけで、次回は6月16日(木)を予定しています。<br />またよろしくお願いします！<br /><br /><a target="_blank" title="yfrog.com - Image And Video Hosting" href="http://yfrog.com/h61tahej"><img src="http://a.yfrog.com/img618/6782/1tahe.jpg" border="0" /></a><br />]]>
+<h3>特殊な場合<br /></h3>HBaseは、時系列、連番をキーとして扱うことが苦手なことが分かっています。<br /><br />キーが単調増加、もしくは単調減少すると、一番下、もしくは一番上のリージョンに書き込み負荷が集中することになります。<br /><br />1つのリージョンで充分に処理できる程度しか書き込みがない場合で、どうしても時間範囲、連番の範囲でScanする必要がある場合を除いては採用しないほうがいいと思います。<br /><br /><a href="https://github.com/sematext/HBaseWD" target="_blank">HBaseWD</a><br /><br />やむを得ず、かつ書き込みを多少でも分散したい、という場合には、<a href="https://github.com/sematext/HBaseWD" target="_blank">HBaseWD</a>というライブラリが利用できます。<br />これは、各キーにPrefixを付けてくれるライブラリです。<br /><br />例えば[0-f]をPrefixとして、順繰り、ランダム、などで付け、書き込み負荷を16個に分散します。<br />Scanの時には[0-f]のPrefixをつけた16個のScanを行います。<br /><br />良くも悪くもPrefixに利用する値の種類しか分散しませんので、他にいい方法があればそちらを採用すべきだと思います。<br /><br /><h2>カラムファミリーの使い方</h2><h3>論理的分類</h3>基本的には論理的分類によってカラムファミリーをわけます。<br />Twitter取り込みの最新の実装では status、user、place、user_mentions、urls、hashtags、delete となっています。<br /><br />論理的分類で分けるだけでも、それなりにアクセスパターンも分類できている印象です。<br /><br /><h3>tall table vs <strike>fat</strike> wide table</h3>tall table(縦長テーブル) vs <strike>fat</strike> wide table(横長テーブル) の議論がHBaseのMLでよく行われています。<br /><br />tall tableは、RDBのテーブルのように、ほぼ同じカラム数で行数が増えていく(縦に伸びる)テーブルで、<strike>fat</strike> wide tableは、qualifierを利用することで、カラム数が増えていく(横に伸びる)テーブルです。<br /><br />実は、初期のTwitter Streaming取り込みの実装では<strike>fat</strike> wide table方式を採用していました。<br />具体的には、キーにユーザーIDで、カラムファミリーstatusに対してqualifierにステータスIDを指定して、そのユーザーのツイートを同じ行内で横に入れていました。<br /><br /><strike>fat</strike> wide tableの利点は、1つのキーが指定出来れば、紐づくデータを一括で取れるところです。なので、キーの並びを気にせず、自由に分散することができます。(データの偏りは発生します)<br /><br />HBaseを使ったMapReduceへの入力は、キー毎にmapへ入力されます。<br /><strike>fat</strike> wide tableを使うと、mapに同じキーに紐づくデータを一気に投入できるので、reduceで行うような処理をmapで行うことができることがあります。<br />予めshuffleの結果と同等のテーブル設計にしておくと、多段に及ぶMapReduce処理の分岐、合流地点の受け皿としてかなり有用です。<br /><br />大きな問題点は、行の肥大化です。<br />特定の行が太りすぎてしまっても、その行が複数のリージョンに分割されることはありません。<br />また、mapへの入力時にメモリの問題にもなりかねません。<br /><br /><strike>fat</strike> wide tableはとても有用ですが、利用の際にはそのあたりの見積りも必要となります。<br /><br />（修正 2011/06/05: "fat table"という表現はあまり使われていないようなので、wide tableに改めました。）<br />（訂正 2011/06/14: "fat table"は、セルに大きなデータを持つようなテーブルのことを指すようです。大変失礼しました。）<br /><br /><h2>思うこと</h2>貧乏性な発想では、うまくいかない場合が多い。<br />元々大規模向けに作られているので、そのように発想の転換が必要。<br />（とかいうと個人でやってる身としてはツライですが。。。）<br /><br /><h2>おまけ</h2>雑談、飲み会の時に個人的にヒットした発言。<br /><br /><a href="https://twitter.com/ashigeru" target="_blank">@ashigeru</a>さん: 「データのダム」 -&gt; 「最悪テーブルごと入れ替える」<br /><a href="https://twitter.com/doryokujin" target="_blank">@doryokujin</a>さん: 「どこもがんばってるんですね。」<br /><br /><h2>反省</h2>もっと積極的に発言を。<br />話題提供のためにも、説明をスムーズにするためにも、資料を作っていく。<br /><br />というわけで、次回は6月16日(木)を予定しています。<br />またよろしくお願いします！<br /><br /><a target="_blank" title="yfrog.com - Image And Video Hosting" href="http://yfrog.com/h61tahej"><img src="http://a.yfrog.com/img618/6782/1tahe.jpg" border="0" /></a><br />]]>
     </content>
 </entry>
 
 <entry>
     <title>Play framework with Scala その6</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-6.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-6.html" />
     <id>tag:happy-camper.st,2011://2.57</id>
 
     <published>2011-01-29T13:13:09Z</published>
@@ -92,7 +92,7 @@
     <summary>Play framework with Scala を使ってみようシリーズです。...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="Play!" scheme="http://www.sixapart.com/ns/types#category" />
@@ -100,8 +100,8 @@
         <category term="Scala" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
-        <![CDATA[Play framework with Scala を使ってみようシリーズです。<br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-1.html">その1</a><br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-2.html">その2</a><br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-3.html">その3</a><br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-4.html">その4</a><br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-5.html">その5</a><br /><br />先日、Play! 1.1.1 がリリースされました。<br />今回のリリースはバグフィックスとのことですので、大きな機能追加はないようです。<br />開発者MLによると、3月に1.2のリリースを予定しているという話がありました。<br /><br />さて、今回はPlay! on GAE with ScalaでMemcacheを使ってみます。<br />Play!には標準でキャッシュのためのAPIが備わっていますが、GAEモジュールを利用することでGAEのmemcacheにデータをキャッシュすることができます。<br /><br />今回のサンプルのソースは <a href="https://github.com/ueshin/play-hello/tree/play-hello-0.0.4" target="_blank">https://github.com/ueshin/play-hello/tree/play-hello-0.0.4</a> でブラウズできます。<br />Play!本体とsienaモジュールをアップデート（play-1.1.1、siena-1.4）してありますので適宜インストールもしくは読み替えをして下さい。<br /><br />]]>
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
+        <![CDATA[Play framework with Scala を使ってみようシリーズです。<br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-1.html">その1</a><br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-2.html">その2</a><br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-3.html">その3</a><br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-4.html">その4</a><br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-5.html">その5</a><br /><br />先日、Play! 1.1.1 がリリースされました。<br />今回のリリースはバグフィックスとのことですので、大きな機能追加はないようです。<br />開発者MLによると、3月に1.2のリリースを予定しているという話がありました。<br /><br />さて、今回はPlay! on GAE with ScalaでMemcacheを使ってみます。<br />Play!には標準でキャッシュのためのAPIが備わっていますが、GAEモジュールを利用することでGAEのmemcacheにデータをキャッシュすることができます。<br /><br />今回のサンプルのソースは <a href="https://github.com/ueshin/play-hello/tree/play-hello-0.0.4" target="_blank">https://github.com/ueshin/play-hello/tree/play-hello-0.0.4</a> でブラウズできます。<br />Play!本体とsienaモジュールをアップデート（play-1.1.1、siena-1.4）してありますので適宜インストールもしくは読み替えをして下さい。<br /><br />]]>
         <![CDATA[<h2>Scalaモジュールの修正</h2>Play! on GAE with Scalaのキャッシュ機能には次の2つの不具合があるため、現在提供されているPlay!、およびScalaモジュールでは正しく動作しません。(2011.01.29現在)<br /><br /><ul><li>Scalaモジュールの<code>ScalaCache</code>が、<code>Actor</code>を起動しようとする。<br />-&gt; GAEでは<code>Thread</code>が利用できない(必然的に<code>Actor</code>も利用できない)ため、エラーとなってしまう。<br />-&gt; github上では修正済みですが、まだリリースされていません。<br /></li><li>Play!起動時の初期化フローが正しくない（と思われる）ため、<code>GAECache</code>を利用するよう設定されない。<br />-&gt; Java版でも同様の現象となります。<br />-&gt; Play! 1.1.1 でも修正されていませんでした。 =&gt; <a href="http://play.lighthouseapp.com/projects/57987/tickets/527-gae-cache-not-initialized" target="_blank">ticket #527</a></li></ul><br />上記2点は、Scalaモジュール0.8を少しだけ修正することで回避できます。<br /><br /><h3>既存のScalaモジュールをコピーする</h3>コピー先のバージョン指定はなんでもいいですし、コピーせずにそのまま修正でも構わないです。<br />指定したバージョンは<code>application.conf</code>ファイルに反映してください。<br /><br /><pre><code>$ cd ${PLAY_HOME}/modules
 $ cp -R scala-0.8 scala-0.8.1</code></pre><br /><h3>scala-0.8.1/src/play/cache/ScalaCache.scalaを修正</h3>15行目をlazyにする。<br /><br /><pre><code> 13   private def prefixed(key: String) = "__" + key
  14 
@@ -125,7 +125,7 @@ $ cp -R scala-0.8 scala-0.8.1</code></pre><br /><h3>scala-0.8.1/src/play/cache/S
 
 <entry>
     <title>Play framework with Scala その5</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-5.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-5.html" />
     <id>tag:happy-camper.st,2010://2.56</id>
 
     <published>2010-12-24T14:23:09Z</published>
@@ -134,7 +134,7 @@ $ cp -R scala-0.8 scala-0.8.1</code></pre><br /><h3>scala-0.8.1/src/play/cache/S
     <summary>Play framework with Scala を使ってみようシリーズです。...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="Play!" scheme="http://www.sixapart.com/ns/types#category" />
@@ -142,18 +142,18 @@ $ cp -R scala-0.8 scala-0.8.1</code></pre><br /><h3>scala-0.8.1/src/play/cache/S
         <category term="Scala" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
-        <![CDATA[Play framework with Scala を使ってみようシリーズです。<br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-1.html">その1</a><br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-2.html">その2</a><br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-3.html">その3</a><br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-4.html">その4</a><br /><br />なんかすっかりPlay! on GAE with Scalaな感じになってきましたが、RDBMSでのサンプルは<a href="http://playdocja.appspot.com/documentation/1.1/guide1" target="_blank">yabe</a>に任せることにして、引き続きGAEをさわっていきます。<br /><br />今回はDatastoreへのアクセスを見てみます。<br />Datastoreについては <a href="http://www.amazon.co.jp/gp/product/4798026999?ie=UTF8&amp;tag=ueshin1-22&amp;linkCode=as2&amp;camp=247&amp;creative=7399&amp;creativeASIN=4798026999" target="_blank">オープンソース徹底活用 Slim3 on Google App Engine for Java</a><img src="http://www.assoc-amazon.jp/e/ir?t=ueshin1-22&amp;l=as2&amp;o=9&amp;a=4798026999" alt="" style="border: medium none ! important; margin: 0px ! important;" height="1" width="1" border="0" /> という本でかなり詳しく解説してありますので、こちらを参照してください。<br /><br />今回のサンプルのソースは <a href="https://github.com/ueshin/play-hello/tree/play-hello-0.0.3" target="_blank">https://github.com/ueshin/play-hello/tree/play-hello-0.0.3</a> でブラウズできます。<br /><br />]]>
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
+        <![CDATA[Play framework with Scala を使ってみようシリーズです。<br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-1.html">その1</a><br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-2.html">その2</a><br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-3.html">その3</a><br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-4.html">その4</a><br /><br />なんかすっかりPlay! on GAE with Scalaな感じになってきましたが、RDBMSでのサンプルは<a href="http://playdocja.appspot.com/documentation/1.1/guide1" target="_blank">yabe</a>に任せることにして、引き続きGAEをさわっていきます。<br /><br />今回はDatastoreへのアクセスを見てみます。<br />Datastoreについては <a href="http://www.amazon.co.jp/gp/product/4798026999?ie=UTF8&amp;tag=ueshin1-22&amp;linkCode=as2&amp;camp=247&amp;creative=7399&amp;creativeASIN=4798026999" target="_blank">オープンソース徹底活用 Slim3 on Google App Engine for Java</a><img src="http://www.assoc-amazon.jp/e/ir?t=ueshin1-22&amp;l=as2&amp;o=9&amp;a=4798026999" alt="" style="border: medium none ! important; margin: 0px ! important;" height="1" width="1" border="0" /> という本でかなり詳しく解説してありますので、こちらを参照してください。<br /><br />今回のサンプルのソースは <a href="https://github.com/ueshin/play-hello/tree/play-hello-0.0.3" target="_blank">https://github.com/ueshin/play-hello/tree/play-hello-0.0.3</a> でブラウズできます。<br /><br />]]>
         <![CDATA[<h2>sienaモジュール</h2>Datastoreを使うには、<a href="http://www.playframework.org/modules/siena" target="_blank">sienaモジュール</a>を追加します。<br /><br />標準のJPAでも（制限付きで）Datastoreにアクセスできると思っていたんですが、GAEで利用できないAPIを内部で使っているらしく、エラーになってしまいました。<br /><br /><a href="http://www.sienaproject.com/" target="_blank">Siena</a>は、GAE/PyのDatastore APIにインスパイアされて実装したJava APIだそうです。<br /><br /><blockquote>Siena is a single API with many implementations. You can use siena with relational databases, with the Google App Engine's datastore or with Amazon's SimpleDB. There is also an implementation called siena-remote very useful if you want to use the Google App Engine's datastore remotely. Other implmenetations are planned such as: HBase, DBSLayer,...</blockquote><br />あまり複雑なことはできませんが、RDB、GAEのDatastoreだけでなく、Amazon SimpleDBやHBaseでも利用出来る（予定含む）そうで、ソースコードの再利用を考えるといいかもしれません。<br /><br /><h3>インストール</h3><code>install</code>コマンドを使ってインストールします。<br /><br /><pre><code>$ play install siena-1.3</code></pre><br /><h3>設定</h3><code>conf/application.conf</code>ファイルに、sienaモジュールを使うよう設定します。<br /><br /><pre><code>module.scala=${play.path}/modules/scala-0.8
 module.gae=${play.path}/modules/gae-1.4
 module.siena=${play.path}/modules/siena-1.3</code></pre><br />これでsienaを使う準備ができました。<br /><br /><h2><code>Model</code>クラス</h2>まず<code>Model</code>クラスを継承したエンティティクラスを実装します。<br />このクラスが<code>Kind</code>となり、インスタンスが<code>Entity</code>、フィールドが<code>Property</code>になります。<br /><br /><code>id</code>値を表す<code>@Id</code>アノテーションのついた<code>Long</code>型のフィールド（フィールド名は任意）は必須です。<br />LowLevelAPIでは文字列の<code>name</code>値も利用できますが、sienaでは<code>Long</code>の<code>id</code>値のみとなっています。<br /><br />フィールドで利用出来るクラスは、Datastoreで利用出来るものと同じです。<br />リストプロパティにScalaの<code>List</code>は使えないので、Javaの<code>List</code>を指定するように気をつけましょう。<br /><br />デフォルトコンストラクタが必須なので、忘れずに定義してください。<br /><br /><h3><code>insert</code>/<code>update</code>/<code>delete</code></h3><code>Model</code>クラスを継承すると、<code>insert</code>/<code>update</code>/<code>delete</code>メソッドが使えます。<br />それぞれデータの追加、更新、削除を行うメソッドになります。<br />
-<code>id</code>値は<code>insert</code>時に自動採番され、値がセットされます。<br /><br /><h3>クエリ</h3>コンパニオンオブジェクトでクエリを実装します。<br /><br /><code>Model.all</code>メソッドでクエリオブジェクトを作成できますので、<code>filter</code>/<code>order</code>を設定した後に<code>fetch</code>/<code>get</code>/<code>count</code>することでデータを取得できます。<br /><br /><h3>例) <a href="https://github.com/ueshin/play-hello/blob/play-hello-0.0.3/app/models/User.scala" target="_blank"><code>models/User.scala</code></a></h3><code>id</code>、<code>email</code>、<code>joinedAt</code>、<code>invitedAt</code>という4つのフィールドを定義してあります。<br /><br />コンパニオンオブジェクトにて、<code>all</code>メソッドを<code>public</code>のままにしておけば、利用側でなんでもできるようになりますが、あまりなんでもできるようにすると管理ができなくなる恐れがあるので、いったん<code>private</code>にして、外部から利用するのに必要なクエリだけを公開するようにしています。<br /><br /><code>id</code>による<code>get</code>は<code>Option</code>でくるんでおいたほうが何かと便利です。<br />また、<code>fetch</code>したものは<code>toList</code>を付けておけばScalaの<code>List</code>として扱うことができるようになります。（<code>import _root_.scala.collection.JavaConversions._</code>を忘れずに。。。）<br /><br /><h2>サンプルアプリ</h2><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-4.html">前回</a>から引き続き、<a href="http://3.latest.play-hello.appspot.com/" target="_blank">サンプルアプリ</a>を公開しています。<br /><br />ログインすると挨拶をポストできるようになります。<br />挨拶文は自分か、自分がフォローしている人のものを見ることができます。<br /><br />フォローするには、Followings画面でフォローしたい人のメールアドレスを入力します。<br />フォロー後にポストされた挨拶文から見ることができるようになります。<br /><br />相変わらず見た目がしょぼいのでどなたかがデザインをあててくれる事を切に願います。<br /><br />Play Hello!<br /><br />]]>
+<code>id</code>値は<code>insert</code>時に自動採番され、値がセットされます。<br /><br /><h3>クエリ</h3>コンパニオンオブジェクトでクエリを実装します。<br /><br /><code>Model.all</code>メソッドでクエリオブジェクトを作成できますので、<code>filter</code>/<code>order</code>を設定した後に<code>fetch</code>/<code>get</code>/<code>count</code>することでデータを取得できます。<br /><br /><h3>例) <a href="https://github.com/ueshin/play-hello/blob/play-hello-0.0.3/app/models/User.scala" target="_blank"><code>models/User.scala</code></a></h3><code>id</code>、<code>email</code>、<code>joinedAt</code>、<code>invitedAt</code>という4つのフィールドを定義してあります。<br /><br />コンパニオンオブジェクトにて、<code>all</code>メソッドを<code>public</code>のままにしておけば、利用側でなんでもできるようになりますが、あまりなんでもできるようにすると管理ができなくなる恐れがあるので、いったん<code>private</code>にして、外部から利用するのに必要なクエリだけを公開するようにしています。<br /><br /><code>id</code>による<code>get</code>は<code>Option</code>でくるんでおいたほうが何かと便利です。<br />また、<code>fetch</code>したものは<code>toList</code>を付けておけばScalaの<code>List</code>として扱うことができるようになります。（<code>import _root_.scala.collection.JavaConversions._</code>を忘れずに。。。）<br /><br /><h2>サンプルアプリ</h2><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-4.html">前回</a>から引き続き、<a href="http://3.latest.play-hello.appspot.com/" target="_blank">サンプルアプリ</a>を公開しています。<br /><br />ログインすると挨拶をポストできるようになります。<br />挨拶文は自分か、自分がフォローしている人のものを見ることができます。<br /><br />フォローするには、Followings画面でフォローしたい人のメールアドレスを入力します。<br />フォロー後にポストされた挨拶文から見ることができるようになります。<br /><br />相変わらず見た目がしょぼいのでどなたかがデザインをあててくれる事を切に願います。<br /><br />Play Hello!<br /><br />]]>
     </content>
 </entry>
 
 <entry>
     <title>MapReduce in Scala</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/lang/scala/mapreduce-in-scala.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/lang/scala/mapreduce-in-scala.html" />
     <id>tag:happy-camper.st,2010://2.55</id>
 
     <published>2010-12-15T12:19:05Z</published>
@@ -162,7 +162,7 @@ module.siena=${play.path}/modules/siena-1.3</code></pre><br />これでsienaを�
     <summary>この記事は Scala Advent Calendar jp 2010 の9日目...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="Scala" scheme="http://www.sixapart.com/ns/types#category" />
@@ -170,9 +170,9 @@ module.siena=${play.path}/modules/siena-1.3</code></pre><br />これでsienaを�
         <category term="お試し" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
         <![CDATA[この記事は <a href="http://atnd.org/events/10683" target="_blank">Scala Advent Calendar jp 2010</a> の9日目です。<br /><br />と言いつつ空気を読まずにMapReduceやっちゃいますよ。<br />簡易的にではありますが、GoogleやHadoopでおなじみ(?)のMapReduceフレームワークをScalaで実装してみました。<br /><br />というわけで、これを実装したときのポイントや便利な機能などを挙げていこうと思います。<br /><br />]]>
-        <![CDATA[<h2>MapReduceって？</h2><a href="http://labs.google.com/papers/mapreduce.html" target="_blank">Googleが提唱</a>した、シンプルかつ強力な大規模分散処理のためのプログラミングモデルです。<br /><a href="http://hadoop.apache.org/" target="_blank">Hadoop</a>というプロダクトがオープンソースで公開されていて、比較的容易に大規模分散処理を実現できるようになっています。<br /><br />詳しい説明は他のサイト（<a href="http://wiki.apache.org/hadoop/MapReduce" target="_blank">HadoopWiki</a>とか<a href="http://www.atmarkit.co.jp/fjava/special/distributed01/distributed01_1.html" target="_blank">@IT</a>とか<a href="http://www.google.co.jp/images?hl=ja&amp;client=firefox-a&amp;rls=org.mozilla:ja-JP-mac:official&amp;q=mapreduce&amp;um=1&amp;ie=UTF-8&amp;source=univ&amp;ei=p2oHTdvJEs3srQfk4_WQDg&amp;sa=X&amp;oi=image_result_group&amp;ct=title&amp;resnum=7&amp;ved=0CGoQsAQwBg&amp;biw=1240&amp;bih=923" target="_blank">mapreduceの画像検索結果</a>とか）に譲ります。<br /><br /><h2>実装</h2>( ソースコードは<a href="https://gist.github.com/740567" target="_blank">gist</a>にも置いてあります。 )<br /><br /><h3>mapreduce.scala</h3>実装したソースコードが以下です。<br /><br /><pre><code>package object mapreduce {
+        <![CDATA[<h2>MapReduceって？</h2><a href="http://labs.google.com/papers/mapreduce.html" target="_blank">Googleが提唱</a>した、シンプルかつ強力な大規模分散処理のためのプログラミングモデルです。<br /><a href="http://hadoop.apache.org/" target="_blank">Hadoop</a>というプロダクトがオープンソースで公開されていて、比較的容易に大規模分散処理を実現できるようになっています。<br /><br />詳しい説明は他のサイト（<a href="http://wiki.apache.org/hadoop/MapReduce" target="_blank">HadoopWiki</a>とか<a href="http://www.atmarkit.co.jp/fjava/special/distributed01/distributed01_1.html" target="_blank">@IT</a>とか<a href="https://www.google.co.jp/images?hl=ja&amp;client=firefox-a&amp;rls=org.mozilla:ja-JP-mac:official&amp;q=mapreduce&amp;um=1&amp;ie=UTF-8&amp;source=univ&amp;ei=p2oHTdvJEs3srQfk4_WQDg&amp;sa=X&amp;oi=image_result_group&amp;ct=title&amp;resnum=7&amp;ved=0CGoQsAQwBg&amp;biw=1240&amp;bih=923" target="_blank">mapreduceの画像検索結果</a>とか）に譲ります。<br /><br /><h2>実装</h2>( ソースコードは<a href="https://gist.github.com/740567" target="_blank">gist</a>にも置いてあります。 )<br /><br /><h3>mapreduce.scala</h3>実装したソースコードが以下です。<br /><br /><pre><code>package object mapreduce {
 
   import _root_.scala.actors.Futures._
   import _root_.scala.collection.SortedMap
@@ -230,13 +230,13 @@ module.siena=${play.path}/modules/siena-1.3</code></pre><br />これでsienaを�
       source.close
     }
   }
-}</code></pre><br />コンパイルして実行してみてください。（第1引数に集計対象ファイル名を指定します。）<br />ファイルに含まれる単語と、その出現回数が表示されます。<br />単語はアルファベット順にソートされています。<br /><br /><h3>ポイント</h3>サンプルの前半では入力値をゴニョゴニョしています（<code>textInputFormat</code>関数）が、本体は後半です。<br /><br />このサンプルの<code>map</code>フェーズでは、ファイルの各行毎に<code>mapper</code>関数が呼ばれ、各行を単語に分割して、 <code>(word -&gt; 1)</code> の組のリストを出力しています。<br /><br /><code>reduce</code>フェーズでは、<code>reducer</code>関数が呼ばれる前にキーで並べ替え＆同じキーに対応するバリューをリストにまとめる（<code>shuffle</code>フェーズ、正確には<code>reduce</code>フェーズの前）という処理をします。<br />その後、各キー＆バリューのリスト <code>( word -&gt; ( 1, 1, 1, ... ) )</code> に対して<code>reducer</code>関数が呼ばれ、最終的な結果となります。<br /><br />実はこの裏で行われる<code>shuffle</code>フェーズのおかげで、MapReduceがシンプルかつ強力なプログラミングモデルとなっています。<br /><code>shuffle</code>フェーズは、「魔法が生まれる場所」と言われています。<br /><br /><h2>Scala的に</h2>さて、本題です。<br />これを実装するにあたって利用したScala的なあれこれを少々。<br /><br /><h3>Future</h3>分散環境を模擬するために、<code>mapper</code>/<code>reducer</code>関数の呼び出しに<code>future</code>を使っています。<br /><br />Futureとは、スレッドやアクターなどの非同期処理から返り値を受け取るためのパターンです。<br />Scalaでは標準でライブラリとして実装されていますので、お手軽に利用です。<br /><br />返り値を受け取るためには、<code>apply()</code>メソッドを呼び出します。<br />もし処理が終わっていれば、その返り値を受け取れますし、終っていなければ終わるまで待ちます。<br /><br /><h3><code>(implicit ord: Ordering[A])</code></h3>あるメソッドの型引数が並べ替え可能であることを保証する必要がある場合があります。<br />このような場合には、implicitパラメータを使えばいいと思います。<br /><br /><pre><code>def iterable2Reducable[A, B](r: Iterable[(A, B)])(implicit ord: Ordering[A]) = new Reducable(r)(ord)</code></pre><br />このようにすると、<code>Ordering[A]</code>がどこかで定義されていなければ、メソッド呼び出しができないので、<code>A</code>は並べ替え可能である、と保証できます。<br /><code>A &lt;: Ordered[A]</code> である場合にも <code>Ordering[A]</code> が自動的に導かれるようになっています。<br /><br /><h3><code>Stream</code></h3><code>Stream</code>は、無限リストを実現するためのクラスです。<br />この例では引数に指定したファイル長で終わってしまいますが、作り方によっては無限長にすることができます。<br /><br />例えばフィボナッチ数列は<br /><br /><pre><code>lazy val fib: Stream[BigInt] = Stream.cons(0, Stream.cons(1, fib.zip(fib.tail).map(p =&gt; p._1 + p._2)))</code></pre><br />と書けるそうです。<br /><br />実はまだあまり<code>Stream</code>を使いこなせないんですが、ハマれば強力な武器になります。<br /><br /><h3>implicit conversion</h3>これはさほど触れるまでもなく各所で使われている機能ですが、今回もこれを用いて元の<code>Iterable</code>インスタンスから<code>Mappable</code>/<code>Reducable</code>クラスのインスタンスに変換しています。<br /><br />本当は<code>mapper</code>/<code>reducer</code>というメソッド名ではなく、<code>map</code>/<code>reduce</code>としたかったのですが、元からあるメソッドと同名のメソッド（引数違い）ではimplicit conversionの手がかりにはならない(?)ようで、うまく変換されませんでした。<br /><br />うまく行くやり方があるのであれば、教えていただきたいです。<br /><br /><h2>まとめ</h2>というわけでMapReduceの簡単な紹介とこれにまつわるScalaあれこれでした。<br />MapReduceの実装も簡易版ではありますが、Hadoopは敷居が高いな〜という人の入門編くらいには使えるのではないでしょうか。<br />いろいろなものをMapReduceして遊んでみると面白いと思います。<br /><br />Hadoopでやってみたいという方は <a href="http://happy-camper.st/lang/java/hadoop/">Hadoopカテゴリ</a> にてすこしずつ紹介していますので、そちらも御覧いただければと思います。<br /><br />]]>
+}</code></pre><br />コンパイルして実行してみてください。（第1引数に集計対象ファイル名を指定します。）<br />ファイルに含まれる単語と、その出現回数が表示されます。<br />単語はアルファベット順にソートされています。<br /><br /><h3>ポイント</h3>サンプルの前半では入力値をゴニョゴニョしています（<code>textInputFormat</code>関数）が、本体は後半です。<br /><br />このサンプルの<code>map</code>フェーズでは、ファイルの各行毎に<code>mapper</code>関数が呼ばれ、各行を単語に分割して、 <code>(word -&gt; 1)</code> の組のリストを出力しています。<br /><br /><code>reduce</code>フェーズでは、<code>reducer</code>関数が呼ばれる前にキーで並べ替え＆同じキーに対応するバリューをリストにまとめる（<code>shuffle</code>フェーズ、正確には<code>reduce</code>フェーズの前）という処理をします。<br />その後、各キー＆バリューのリスト <code>( word -&gt; ( 1, 1, 1, ... ) )</code> に対して<code>reducer</code>関数が呼ばれ、最終的な結果となります。<br /><br />実はこの裏で行われる<code>shuffle</code>フェーズのおかげで、MapReduceがシンプルかつ強力なプログラミングモデルとなっています。<br /><code>shuffle</code>フェーズは、「魔法が生まれる場所」と言われています。<br /><br /><h2>Scala的に</h2>さて、本題です。<br />これを実装するにあたって利用したScala的なあれこれを少々。<br /><br /><h3>Future</h3>分散環境を模擬するために、<code>mapper</code>/<code>reducer</code>関数の呼び出しに<code>future</code>を使っています。<br /><br />Futureとは、スレッドやアクターなどの非同期処理から返り値を受け取るためのパターンです。<br />Scalaでは標準でライブラリとして実装されていますので、お手軽に利用です。<br /><br />返り値を受け取るためには、<code>apply()</code>メソッドを呼び出します。<br />もし処理が終わっていれば、その返り値を受け取れますし、終っていなければ終わるまで待ちます。<br /><br /><h3><code>(implicit ord: Ordering[A])</code></h3>あるメソッドの型引数が並べ替え可能であることを保証する必要がある場合があります。<br />このような場合には、implicitパラメータを使えばいいと思います。<br /><br /><pre><code>def iterable2Reducable[A, B](r: Iterable[(A, B)])(implicit ord: Ordering[A]) = new Reducable(r)(ord)</code></pre><br />このようにすると、<code>Ordering[A]</code>がどこかで定義されていなければ、メソッド呼び出しができないので、<code>A</code>は並べ替え可能である、と保証できます。<br /><code>A &lt;: Ordered[A]</code> である場合にも <code>Ordering[A]</code> が自動的に導かれるようになっています。<br /><br /><h3><code>Stream</code></h3><code>Stream</code>は、無限リストを実現するためのクラスです。<br />この例では引数に指定したファイル長で終わってしまいますが、作り方によっては無限長にすることができます。<br /><br />例えばフィボナッチ数列は<br /><br /><pre><code>lazy val fib: Stream[BigInt] = Stream.cons(0, Stream.cons(1, fib.zip(fib.tail).map(p =&gt; p._1 + p._2)))</code></pre><br />と書けるそうです。<br /><br />実はまだあまり<code>Stream</code>を使いこなせないんですが、ハマれば強力な武器になります。<br /><br /><h3>implicit conversion</h3>これはさほど触れるまでもなく各所で使われている機能ですが、今回もこれを用いて元の<code>Iterable</code>インスタンスから<code>Mappable</code>/<code>Reducable</code>クラスのインスタンスに変換しています。<br /><br />本当は<code>mapper</code>/<code>reducer</code>というメソッド名ではなく、<code>map</code>/<code>reduce</code>としたかったのですが、元からあるメソッドと同名のメソッド（引数違い）ではimplicit conversionの手がかりにはならない(?)ようで、うまく変換されませんでした。<br /><br />うまく行くやり方があるのであれば、教えていただきたいです。<br /><br /><h2>まとめ</h2>というわけでMapReduceの簡単な紹介とこれにまつわるScalaあれこれでした。<br />MapReduceの実装も簡易版ではありますが、Hadoopは敷居が高いな〜という人の入門編くらいには使えるのではないでしょうか。<br />いろいろなものをMapReduceして遊んでみると面白いと思います。<br /><br />Hadoopでやってみたいという方は <a href="https://happy-camper.st/lang/java/hadoop/">Hadoopカテゴリ</a> にてすこしずつ紹介していますので、そちらも御覧いただければと思います。<br /><br />]]>
     </content>
 </entry>
 
 <entry>
     <title>Play framework with Scala その4</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-4.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-4.html" />
     <id>tag:happy-camper.st,2010://2.54</id>
 
     <published>2010-12-08T12:02:33Z</published>
@@ -245,7 +245,7 @@ module.siena=${play.path}/modules/siena-1.3</code></pre><br />これでsienaを�
     <summary>Play framework with Scala を使ってみようシリーズです。...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="Play!" scheme="http://www.sixapart.com/ns/types#category" />
@@ -253,8 +253,8 @@ module.siena=${play.path}/modules/siena-1.3</code></pre><br />これでsienaを�
         <category term="Scala" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
-        <![CDATA[Play framework with Scala を使ってみようシリーズです。<br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-1.html">その1</a><br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-2.html">その2</a><br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-3.html">その3</a><br /><br />今日はUserServiceを使ってログインしてみようと思います。<br /><br />今回のサンプルのソースは <a href="https://github.com/ueshin/play-hello/tree/play-hello-0.0.2" target="_blank">https://github.com/ueshin/play-hello/tree/play-hello-0.0.2</a> でブラウズできます。<br /><br />]]>
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
+        <![CDATA[Play framework with Scala を使ってみようシリーズです。<br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-1.html">その1</a><br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-2.html">その2</a><br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-3.html">その3</a><br /><br />今日はUserServiceを使ってログインしてみようと思います。<br /><br />今回のサンプルのソースは <a href="https://github.com/ueshin/play-hello/tree/play-hello-0.0.2" target="_blank">https://github.com/ueshin/play-hello/tree/play-hello-0.0.2</a> でブラウズできます。<br /><br />]]>
         <![CDATA[<h2><code>GAE</code>クラス</h2>GAEモジュールが提供する<code>play.modules.gae.GAE</code>クラスに便利なメソッドがたくさん定義されています。<br /><br />今回は、そのうちの<code>login()</code>/<code>logout()</code>メソッドを使います。<br /><br /><h3><code>login()</code>メソッド</h3><code>Controller</code>からこのメソッドを呼べばGoogleアカウントのログイン画面にリダイレクトします。<br /><br />引数でログイン後の戻り画面を指定することができます。<br />指定は <code>"ControllerClassName.actionMethodName"</code> の形式の文字列です。<br /><br />引数がない場合には呼び出した画面に戻って来ます。<br />管理画面など、ある画面にアクセスしたらログイン画面表示、ログイン後戻ってくる、などの場面で利用出来ます。<br />ログインリンクのアクションで引数なしにするとログイン後再度ログイン画面になってしまうので注意。<br /><br /><h3><code>logout()</code>メソッド</h3><code>Controller</code>からこのメソッドを呼べばGoogleアカウントからログアウトします。<br /><br />引数でログアウト後の戻り画面を指定することができます。<br />指定は<code>login()</code>メソッドと同様、<code>"ControllerClassName.actionMethodName"</code> の形式の文字列です。<br /><br />こちらも引数なしにして呼び出した画面に戻るようにすることができます。<br />ただし、ログアウトリンクのアクションで引数なしを使うとログアウト後にまたログアウト・・・とループしてしまいます。<br />引数なしの<code>logout()</code>メソッドは呼び出す場面が思い浮かびません。。。<br /><br /><h3>getUser()メソッド</h3>Googleアカウントにログインしていれば<code>User</code>オブジェクトを、していなければ<code>null</code>を返します。<br />ログインチェックとユーザー情報取得（メールアドレスのみ）に使います。<br /><br /><h2>Application.scala</h2>それでは実際のコードを見てみます。<br /><br /><a href="https://github.com/ueshin/play-hello/blob/play-hello-0.0.2/app/controllers/Application.scala" target="_blank">app/controllers/Application.scala</a> （前のcontrollers.scalaから移動しています）<br /><br /><pre><code>package controllers
 
 import _root_.play._
@@ -291,7 +291,7 @@ trait Defaults extends Controller {
 
 <entry>
     <title>Play framework with Scala その3</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-3.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-3.html" />
     <id>tag:happy-camper.st,2010://2.53</id>
 
     <published>2010-12-04T17:39:44Z</published>
@@ -300,7 +300,7 @@ trait Defaults extends Controller {
     <summary>Play framework with Scala を使ってみようシリーズです。...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="Play!" scheme="http://www.sixapart.com/ns/types#category" />
@@ -308,9 +308,9 @@ trait Defaults extends Controller {
         <category term="Scala" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
-        <![CDATA[Play framework with Scala を使ってみようシリーズです。<br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-1.html">その1</a><br /><a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-2.html">その2</a><br /><br />さて、やっぱりGoogle AppEngine使いたいですよね。<br />というわけで<a href="http://www.playframework.org/modules/gae" target="_blank">GAEモジュール</a>を使ってみます。<br /><br />Google AppEngineのSDKは<a href="http://code.google.com/intl/ja/appengine/downloads.html" target="_blank">インストールされている</a>ものとします。<br />また、サンプルを実際にAppEngine上で動作確認をする場合には、予めアプリケーションIDを取得しておいてください。<br /><br />今回のサンプルのソースは <a href="https://github.com/ueshin/play-hello/tree/play-hello-0.0.1" target="_blank">https://github.com/ueshin/play-hello/tree/play-hello-0.0.1</a> でブラウズできます。<br /><br />]]>
-        <![CDATA[<h2>GAEモジュール</h2>Play!の<a href="http://www.playframework.org/modules/gae" target="_blank">GAEモジュール</a>を使うとGAEへのデプロイが楽になります。<br /><br />と、それだけではなくて、他にも様々なメリットがあります。<br /><br /><ul><li>Play!標準のディレクトリ構成で</li><li>開発中の自動リロードも動きます</li><li>LoggingはGAEで使う<code>java.util.logging</code>にディスパッチされます</li><li><code>tmp</code>フォルダは使えません</li><li>Datastoreへのアクセスは全てサポートしています</li><li><strike>JPAを使えます。ただし、GAEの制限を受けます</strike> これ、ダメなようです。→ <a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-5.html">その5</a>へ</li><li><code>Cache</code>はGAEの<code>memcache</code>のラッパになります</li><li><code>Mail</code>はGAEの<code>mail</code>サービスのラッパになります</li><li><code>Users</code>サービスを利用でき、開発時には擬似ページが使えます</li><li>モジュールを使うことができます</li><li>GAE環境では強制的に<code>PROD</code>モードになります</li></ul><br /><a href="http://www.playframework.org/modules/gae-1.1/home" target="_blank">ドキュメント</a>から意訳したものですが、訳を間違えていたらごめんなさい。<br /><br /><h3>インストール</h3>Play!の<code>install</code>コマンドを使ってインストールしてもいいですが、今のところ、GAEのSDKのバージョンが1.3.7と少々古いです。<br />現時点で最新の1.4.0が使えるものが<code>fork</code>されていますので、こちら持ってくることにします。<br /><br /><a href="https://github.com/Ouziel/play-gae/tree/GAE1.4.0" target="_blank">github</a>からファイルをダウンロードし、ビルドします。<br /><br /><pre><code>$ wget http://download.github.com/Ouziel-play-gae-36f7634.tar.gz
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
+        <![CDATA[Play framework with Scala を使ってみようシリーズです。<br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-1.html">その1</a><br /><a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-2.html">その2</a><br /><br />さて、やっぱりGoogle AppEngine使いたいですよね。<br />というわけで<a href="http://www.playframework.org/modules/gae" target="_blank">GAEモジュール</a>を使ってみます。<br /><br />Google AppEngineのSDKは<a href="http://code.google.com/intl/ja/appengine/downloads.html" target="_blank">インストールされている</a>ものとします。<br />また、サンプルを実際にAppEngine上で動作確認をする場合には、予めアプリケーションIDを取得しておいてください。<br /><br />今回のサンプルのソースは <a href="https://github.com/ueshin/play-hello/tree/play-hello-0.0.1" target="_blank">https://github.com/ueshin/play-hello/tree/play-hello-0.0.1</a> でブラウズできます。<br /><br />]]>
+        <![CDATA[<h2>GAEモジュール</h2>Play!の<a href="http://www.playframework.org/modules/gae" target="_blank">GAEモジュール</a>を使うとGAEへのデプロイが楽になります。<br /><br />と、それだけではなくて、他にも様々なメリットがあります。<br /><br /><ul><li>Play!標準のディレクトリ構成で</li><li>開発中の自動リロードも動きます</li><li>LoggingはGAEで使う<code>java.util.logging</code>にディスパッチされます</li><li><code>tmp</code>フォルダは使えません</li><li>Datastoreへのアクセスは全てサポートしています</li><li><strike>JPAを使えます。ただし、GAEの制限を受けます</strike> これ、ダメなようです。→ <a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-5.html">その5</a>へ</li><li><code>Cache</code>はGAEの<code>memcache</code>のラッパになります</li><li><code>Mail</code>はGAEの<code>mail</code>サービスのラッパになります</li><li><code>Users</code>サービスを利用でき、開発時には擬似ページが使えます</li><li>モジュールを使うことができます</li><li>GAE環境では強制的に<code>PROD</code>モードになります</li></ul><br /><a href="http://www.playframework.org/modules/gae-1.1/home" target="_blank">ドキュメント</a>から意訳したものですが、訳を間違えていたらごめんなさい。<br /><br /><h3>インストール</h3>Play!の<code>install</code>コマンドを使ってインストールしてもいいですが、今のところ、GAEのSDKのバージョンが1.3.7と少々古いです。<br />現時点で最新の1.4.0が使えるものが<code>fork</code>されていますので、こちら持ってくることにします。<br /><br /><a href="https://github.com/Ouziel/play-gae/tree/GAE1.4.0" target="_blank">github</a>からファイルをダウンロードし、ビルドします。<br /><br /><pre><code>$ wget http://download.github.com/Ouziel-play-gae-36f7634.tar.gz
 $ cd ${PLAY_HOME}/modules
 $ tar zxvf /path/to/Ouziel-play-gae-36f7634.tar.gz
 $ mv Ouziel-play-gae-36f7634 gae-1.1-1.4.0
@@ -324,7 +324,7 @@ $ play gae:deploy play-hello</code></pre><br /><strike>gae-1.1モジュールで
 
 <entry>
     <title>Play framework with Scala その2</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-2.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-2.html" />
     <id>tag:happy-camper.st,2010://2.52</id>
 
     <published>2010-11-30T13:37:31Z</published>
@@ -333,7 +333,7 @@ $ play gae:deploy play-hello</code></pre><br /><strike>gae-1.1モジュールで
     <summary>昨日はPlay frameworkを使ってHello Worldが動きました。今...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="Play!" scheme="http://www.sixapart.com/ns/types#category" />
@@ -341,8 +341,8 @@ $ play gae:deploy play-hello</code></pre><br /><strike>gae-1.1モジュールで
         <category term="Scala" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
-        <![CDATA[<a href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-1.html">昨日</a>は<a href="http://www.playframework.org/" target="_blank">Play framework</a>を使ってHello Worldが動きました。<br /><br />今日はPlay frameworkをやるときによさそうな環境設定について書きたいと思います。<br />ほぼ自分向けのエントリーです。<br /><br />ベースとなる<a href="http://www.eclipse.org/" target="_blank">Eclipse</a>(<a href="http://www.scala-ide.org/" target="_blank">Scala IDE for Eclipse</a>)とEmacs(<a href="http://aemon.com/file_dump/ensime_manual.html" target="_blank">ENSIME</a>)がインストールされているものとします。<br /><br />]]>
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
+        <![CDATA[<a href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-1.html">昨日</a>は<a href="http://www.playframework.org/" target="_blank">Play framework</a>を使ってHello Worldが動きました。<br /><br />今日はPlay frameworkをやるときによさそうな環境設定について書きたいと思います。<br />ほぼ自分向けのエントリーです。<br /><br />ベースとなる<a href="http://www.eclipse.org/" target="_blank">Eclipse</a>(<a href="http://www.scala-ide.org/" target="_blank">Scala IDE for Eclipse</a>)とEmacs(<a href="http://aemon.com/file_dump/ensime_manual.html" target="_blank">ENSIME</a>)がインストールされているものとします。<br /><br />]]>
         <![CDATA[<h2>Eclipseとの連携</h2>Play!のコマンドで、<code>eclipsify</code>というやつがあるのでこれを利用します。<br /><br /><pre><code>$ ${PLAY_HOME}/play eclipsify helloworld</code></pre><br />実行後、プロジェクト内にEclipseの設定ファイルである <code>.project</code> <code>.classpath</code> <code>.settings</code> などが生成されて、「ファイル」→「インポート」でこのプロジェクトをEclipseプロジェクトとしてインポートすることができるようになります。<br /><br />また、<code>eclipse</code>ディレクトリが作成され、サーバーやテストの起動用の<code>.launch</code>ファイルが作られます。<br />コマンドシェルから<code>run</code>コマンドで起動していたサーバーをEclipse上で起動させることができます。<br /><br /><pre><code>eclipse/helloworld.launch</code> ファイルを右クリック → Run As → <code>helloworld</code></pre><br />Eclipseからのビルド先は<code>eclipse/classes</code>に設定されます。<br /><br /><h3>コンパイルエラー？</h3>Scala IDE for EclipseのScalaのバージョンが2.8.1の場合、コンパイルエラーがでます。<br />これは、Play!のScalaモジュール0.8のScalaのバージョンが2.8.0なので、新規に追加されたクラスが見つからないためのようです。<br /><br />ほっておいても問題ないですが、気になる人はScala IDE for Eclipseが提供するScala Libraryライブラリを追加するとエラーが消えます。<br /><br /><pre>Properties → Build Path → "Libraries"タブ → 「Add Library...」 → 「Scala Library」</pre><br />ライブラリの並び順を<code>JRE System Library</code>の次くらいにしておくといいと思います。<br /><br /><h3>デバッグ</h3>デバッグする時にはEclipseでステップ実行などができたら便利です。<br />Eclipseから起動したサーバーであれば、後からデバッグ機能をいれこむことができます。<br /><br /><pre><code>eclipse/Connect JPDA to helloworld.launch</code> ファイルを右クリック → Debug As → <code>Connect JPDA to helloworld</code></pre><br />「接続できました」的なメッセージは表示されませんが、<code>Debug</code>パースペクティブに新しいプロセスが表示されていると思います。<br /><br />この状態でブレークポイントを設定すれば、そこからステップ実行など、いつものデバッグを行うことができます。<br /><br /><h3>他のIDEと連携</h3>Eclipse以外の、<a href="http://netbeans.org/" target="_blank">NetBeans</a>や<a href="http://www.jetbrains.com/idea/" target="_blank">IntelliJ IDEA</a>などの設定ファイルも生成できるコマンドがあります。<br />詳しくは<a href="http://playdocja.appspot.com/documentation/1.1/ide" target="_blank">ドキュメント</a>を参照してください。<br /><br /><h2>Emacs (ENSIME) の設定</h2>ソースファイルの編集にはEmacs (ENSIME) を使っています。<br /><br /><code>M-x ensime-conf-gen</code> で、設定ファイルの雛形を作っていきます。<br />（ <code>/path/to/helloworld</code> は適宜読み替えてください。）<br /><br /><pre><code>Find project root: /path/to/helloworld
 Your project seems to be of type 'custom', continue with this assumption? (yes or no) yes
 What is your project's name? /path/to/helloworld
@@ -367,13 +367,13 @@ Where are classes written by the compiler? /path/to/helloworld/eclipse/classes
 :target "./eclipse/classes"
 
 )</code></pre><br />これで設定ができましたので、ENSIMEを起動します。<br /><br /><pre><code>M-x ensime</code></pre><br />Play!にモジュールを追加すると、依存ライブラリ、もしくはソースコードが付いてくるので、それらを順次追加していくことでENSIMEでの補完やエラー表示なども正しく表示されるようになります。<br /><br /><h2>Maven2で依存ライブラリ取得</h2>Maven2を使うと、依存ライブラリを自動的に（Mavenレポジトリにあれば）収集できて便利です。<br />そこで、<a href="http://www.playframework.org/modules/maven-head/home" target="_blank">Mavenモジュール</a>を使います。<br /><br /><code>conf/application.conf</code> ファイルにMavenモジュールを使うための設定を追加します。<br />Scalaモジュールの設定があるあたり（27行目あたり？）です。<br /><br /><pre><code>module.scala=${play.path}/modules/scala-0.8
-module.maven=${play.path}/modules/maven-head</code></pre><br />これでMavenモジュールのコマンドがPlay!に追加されました。<br /><br /><h3>初期化</h3>まずはMavenモジュールを初期化します。<br /><br /><pre><code>$ ${PLAY_HOME}/play mvn:init helloworld</code></pre><br />プロジェクトに<code>pom.xml</code>ファイルが追加されます。<br /><code>pom.xml</code>ファイルの <code>groupId</code> や <code>artifactId</code> タグの設定は自プロジェクトに合わせて修正したほうがいいかもしれません。<br /><br /><h3>依存ライブラリの管理</h3><code>dependencies</code>タグで依存ライブラリの設定を行った後、<br /><br /><pre><code>$ ${PLAY_HOME}/play mvn:update helloworld</code> // or play mvn:up</pre><br />とすると依存ライブラリをダウンロードし、<code>lib</code>ディレクトリに保存してくれます。<br />また、<br /><br /><pre><code>$ ${PLAY_HOME}/play mvn:refresh helloworld // or play mvn:re</code></pre><br />とするとlib以下を一旦削除してから再度依存ライブラリを格納しなおします。<br />依存ライブラリのバージョンを変更した場合などはこちらを使うことになります。<br /><br />ソースコードをダウンロードする場合には<br /><br /><pre><code>$ ${PLAY_HOME}/play mvn:source helloworld // or play mvn:src</code></pre><br />とします。<br />（ソースコードはレポジトリにない場合がありますので、その場合にはダウンロード出来ません。）<br /><br />新しくライブラリを追加した場合には、再度<code>eclipsify</code>することでEclipseにも認識させることができます。<br />ENSIMEも再起動させれば認識します。<br /><br /><h3>Maven2について</h3>Maven2自体の使い方については、以前まとめましたので、<a href="http://happy-camper.st/lang/java/maven2/">そちらを参照</a>してください。<br />特に依存ライブラリの管理については<a href="http://happy-camper.st/lang/java/maven2/dependency-and-repository.html">依存解決とレポジトリ</a>のページにまとめてあります。<br /><br />Maven2は本来ビルドツールなのですが、Play!で使う場合には依存ライブラリ管理でのみ使うことになりそうです。<br />（Maven2によるビルドも試みましたが、今のところうまくいっていません。）<br /><br />共有ライブラリはMaven2プロジェクトとして構築して、Webアプリ層となるPlay!プロジェクトでそれらを取り込む、という使い方になるのかな。<br /><br /><h2>注意</h2><code>eclipsify</code>や<code>ensime-conf-gen</code>などで生成した設定ファイルは、バージョン管理に含めないほうがいいようです。<br />環境依存の設定が含まれていたりすると他のチームメンバーに影響を与えてしまう場合があるからです。<br />チームメンバーが必ずしもEclipseやEmacsを使っているとも限らないし。<br /><br />たいした手間ではないので、各コマンドを各自で行い、各自の環境に合わせた設定にするようにしましょう。<br /><br /><code>pom.xml</code>ファイルは環境依存しにくいので大丈夫です。というかこれは同じものを使うべき。<br /><br />]]>
+module.maven=${play.path}/modules/maven-head</code></pre><br />これでMavenモジュールのコマンドがPlay!に追加されました。<br /><br /><h3>初期化</h3>まずはMavenモジュールを初期化します。<br /><br /><pre><code>$ ${PLAY_HOME}/play mvn:init helloworld</code></pre><br />プロジェクトに<code>pom.xml</code>ファイルが追加されます。<br /><code>pom.xml</code>ファイルの <code>groupId</code> や <code>artifactId</code> タグの設定は自プロジェクトに合わせて修正したほうがいいかもしれません。<br /><br /><h3>依存ライブラリの管理</h3><code>dependencies</code>タグで依存ライブラリの設定を行った後、<br /><br /><pre><code>$ ${PLAY_HOME}/play mvn:update helloworld</code> // or play mvn:up</pre><br />とすると依存ライブラリをダウンロードし、<code>lib</code>ディレクトリに保存してくれます。<br />また、<br /><br /><pre><code>$ ${PLAY_HOME}/play mvn:refresh helloworld // or play mvn:re</code></pre><br />とするとlib以下を一旦削除してから再度依存ライブラリを格納しなおします。<br />依存ライブラリのバージョンを変更した場合などはこちらを使うことになります。<br /><br />ソースコードをダウンロードする場合には<br /><br /><pre><code>$ ${PLAY_HOME}/play mvn:source helloworld // or play mvn:src</code></pre><br />とします。<br />（ソースコードはレポジトリにない場合がありますので、その場合にはダウンロード出来ません。）<br /><br />新しくライブラリを追加した場合には、再度<code>eclipsify</code>することでEclipseにも認識させることができます。<br />ENSIMEも再起動させれば認識します。<br /><br /><h3>Maven2について</h3>Maven2自体の使い方については、以前まとめましたので、<a href="https://happy-camper.st/lang/java/maven2/">そちらを参照</a>してください。<br />特に依存ライブラリの管理については<a href="https://happy-camper.st/lang/java/maven2/dependency-and-repository.html">依存解決とレポジトリ</a>のページにまとめてあります。<br /><br />Maven2は本来ビルドツールなのですが、Play!で使う場合には依存ライブラリ管理でのみ使うことになりそうです。<br />（Maven2によるビルドも試みましたが、今のところうまくいっていません。）<br /><br />共有ライブラリはMaven2プロジェクトとして構築して、Webアプリ層となるPlay!プロジェクトでそれらを取り込む、という使い方になるのかな。<br /><br /><h2>注意</h2><code>eclipsify</code>や<code>ensime-conf-gen</code>などで生成した設定ファイルは、バージョン管理に含めないほうがいいようです。<br />環境依存の設定が含まれていたりすると他のチームメンバーに影響を与えてしまう場合があるからです。<br />チームメンバーが必ずしもEclipseやEmacsを使っているとも限らないし。<br /><br />たいした手間ではないので、各コマンドを各自で行い、各自の環境に合わせた設定にするようにしましょう。<br /><br /><code>pom.xml</code>ファイルは環境依存しにくいので大丈夫です。というかこれは同じものを使うべき。<br /><br />]]>
     </content>
 </entry>
 
 <entry>
     <title>Play framework with Scala その1</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/lang/scala/play/play-framework-with-scala-1.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/lang/scala/play/play-framework-with-scala-1.html" />
     <id>tag:happy-camper.st,2010://2.51</id>
 
     <published>2010-11-29T13:03:21Z</published>
@@ -382,7 +382,7 @@ module.maven=${play.path}/modules/maven-head</code></pre><br />これでMavenモ
     <summary>Play frameworkを触ってみましたよ。Ruby on Railsのお手...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="Play!" scheme="http://www.sixapart.com/ns/types#category" />
@@ -390,7 +390,7 @@ module.maven=${play.path}/modules/maven-head</code></pre><br />これでMavenモ
         <category term="Scala" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
         <![CDATA[<a href="http://www.playframework.org/" target="_blank">Play framework</a>を触ってみましたよ。<br /><br />Ruby on Railsのお手軽さをJavaで！っていう感じのWebアプリフレームワークです。<br />Java版は直接使ってはいませんが、Scalaとの相性が抜群な印象です。<br /><a href="http://playdocja.appspot.com/" target="_blank">日本語のドキュメント</a>もありますよ。<br /> <br />今回はPlay frameworkインストールからHello Worldまでいきます。<br /><br /><ul><li>Play framework: 1.1</li><li>Scala module: scala-0.8</li><li>Maven module: maven-head<br /></li></ul><br />JavaやScalaはインストールしてあるものとします。<br /><br />]]>
         <![CDATA[<h2>インストール</h2><a href="http://download.playframework.org/releases/play-1.1.zip" target="_blank">Download</a>リンクからダウンロードします。<br /><br />適当な場所に展開します。<br /><br /><pre><code>$ unzip /path/to/play-1.1.zip</code></pre><br />以下、展開したパスを <code>${PLAY_HOME}</code> を表記します。<br /><br /><h3>モジュールのインストール</h3>Play! のサイトで公開されているモジュールのインストールは、<code>play</code>コマンドで行います。<br />ここでは、ScalaモジュールとMavenモジュールをインストールしましょう。<br /><br /><pre><code>$ ${PLAY_HOME}/play install scala-0.8
 $ ${PLAY_HOME}/play install maven-head</code></pre><br /><h2>Hello World!<br /></h2><h3>プロジェクト作成</h3><code>play</code>コマンドでプロジェクトを作成します。<br /><br /><pre><code>$ ${PLAY_HOME}/play new helloworld --with scala</code></pre><br />オプション <code>--with scala</code> を付けることで、Scalaモジュールを読み込んだ状態でプロジェクトが作成されます。<br /><br /><h3>とりあえず実行してみる</h3>さっそくですが、実行して画面を見てみましょう。<br />デフォルトでは8000番と9000番のポートを使うことになっているので、ここは空けておいてください。<br /><br /><pre><code>$ ${PLAY_HOME}/play run helloworld
@@ -424,7 +424,7 @@ object Application extends Controller {
 
 <entry>
     <title>iPhone用ライブラリを作成する</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/lang/objective-c/how-to-create-cocoa-touch-static-libraries.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/lang/objective-c/how-to-create-cocoa-touch-static-libraries.html" />
     <id>tag:happy-camper.st,2010://2.50</id>
 
     <published>2010-10-26T16:14:04Z</published>
@@ -433,13 +433,13 @@ object Application extends Controller {
     <summary>めっきりiPhoneアプリ構築中です。Twitterクライアントをいくつか作って...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="Objective-C" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
         <![CDATA[めっきりiPhoneアプリ構築中です。<br /><br />Twitterクライアントをいくつか作ってみたいので、API呼び出しなどの共通部分をライブラリとして外出ししようとした時のメモ書きです。<br /> <br />参考にしたのは以下のサイトです。<br /><br /><ul><li><a href="http://www.syati-project.jp/iphone/create-library.html" target="_blank">iPhone/ライブラリ作成 - syati-project.jp</a></li><li><a href="http://d.hatena.ne.jp/mmasashi/20100916/1286129329" target="_blank">staticライブラリにカテゴリを含む際に気をつけること - 風日記</a></li><li><a href="http://d.hatena.ne.jp/shunsuk/20100430/1272624237" target="_blank">Xcodeでアプリのプロジェクトにライブラリのプロジェクトを追加したりね。 - このブログは証明できない。</a></li></ul><br />]]>
         <![CDATA[<h2>プロジェクトの作成</h2>Xcodeより、新規プロジェクトで「Cocoa Touch Static Library」テンプレートよりプロジェクトを作成します。<br /><br />「グループとファイル」内、「Classes」に実装ファイルを入れていきますが、実ファイル階層はフラットになっているので、必要に応じてFinderなりで階層を作ってグループの情報からパスを設定する必要があります。<br /><br /><h2>ユニットテスト</h2>Xcodeでは、「SenTestingKit.framework」というユニットテストのフレームワークがあります。<br /><br /><h3>ターゲットを追加</h3>「グループとファイル」の「ターゲット」を右クリック、「追加」→「新規ターゲット」を選ぶと新規ターゲットダイアログが表示されるので、「Cocoa Touch」→「Unit Test Bundle」を選択し、適当な名前を付けて保存します。<br /><br />Xcode-3.2.4 ではそのままではテスト実行時にエラーになるので、追加したターゲット内「スクリプトを実行」の「情報を見る」とテスト実行スクリプトが表示されるので、これを修正します。<br /><br /><pre><code># Run the unit tests in this test bundle.
 "${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests"</code></pre><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ↓<br /><br /><pre><code># Run the unit tests in this test bundle.
@@ -495,7 +495,7 @@ object Application extends Controller {
 
 <entry>
     <title>ダイクストラ法</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/lang/scala/dijkstras-algorithm.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/lang/scala/dijkstras-algorithm.html" />
     <id>tag:happy-camper.st,2010://2.49</id>
 
     <published>2010-09-17T16:35:57Z</published>
@@ -504,7 +504,7 @@ object Application extends Controller {
     <summary>最短経路問題を解くためのアルゴリズムである「ダイクストラ法 (Dijkstra&apos;...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="Scala" scheme="http://www.sixapart.com/ns/types#category" />
@@ -512,7 +512,7 @@ object Application extends Controller {
         <category term="お試し" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
         <![CDATA[最短経路問題を解くためのアルゴリズムである「ダイクストラ法 (Dijkstra's Algorithm)」というのをScalaで実装してみました。<br /><br />参考にしたのは <a href="http://www.deqnotes.net/acmicpc/dijkstra/" target="_blank">ダイクストラ法（最短経路問題）</a> です。<br /><br /><blockquote>ダイクストラ法 (Dijkstra's Algorithm) は最短経路問題を効率的に解くグラフ理論におけるアルゴリズムです。スタートノードからゴールノードまでの最短距離とその経路を求めることができます。</blockquote><br />正しく実装出来ているかどうかはよくわかりません。。。<br /><br />]]>
         <![CDATA[<h2>dijkstra.scala</h2><pre><code>object Dijkstra extends Application {
 
@@ -559,7 +559,7 @@ object Application extends Controller {
 
 <entry>
     <title>Coming on Stream その5</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/idea/development/cminst/coming-on-stream-5.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/idea/development/cminst/coming-on-stream-5.html" />
     <id>tag:happy-camper.st,2010://2.48</id>
 
     <published>2010-09-11T10:57:59Z</published>
@@ -568,7 +568,7 @@ object Application extends Controller {
     <summary>Coming on Streamシリーズ ファーストシーズン最終回。その1その2...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="HBase" scheme="http://www.sixapart.com/ns/types#category" />
@@ -580,8 +580,8 @@ object Application extends Controller {
         <category term="cminst" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
-        <![CDATA[Coming on Streamシリーズ ファーストシーズン最終回。<br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-1.html">その1</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-2.html">その2</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-3.html">その3</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-4.html">その4</a><br /><br />最終回として、今回もろもろ利用したScala的な何かについてつらつらと書きます。<br /><br />今回利用するプログラムも、<br /><br /><pre><code>$ git clone https://github.com/ueshin/hbase-twitter.git
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
+        <![CDATA[Coming on Streamシリーズ ファーストシーズン最終回。<br /><a href="https://happy-camper.st/development/cminst/coming-on-stream-1.html">その1</a><br /><a href="https://happy-camper.st/development/cminst/coming-on-stream-2.html">その2</a><br /><a href="https://happy-camper.st/development/cminst/coming-on-stream-3.html">その3</a><br /><a href="https://happy-camper.st/development/cminst/coming-on-stream-4.html">その4</a><br /><br />最終回として、今回もろもろ利用したScala的な何かについてつらつらと書きます。<br /><br />今回利用するプログラムも、<br /><br /><pre><code>$ git clone https://github.com/ueshin/hbase-twitter.git
 $ cd hbase-twitter
 $ git checkout hbase-twitter-0.0.2</code></pre><br />を利用します。<br /><br />また <a href="https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.2" target="_blank">https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.2</a>でブラウズできます。<br /><br />]]>
         <![CDATA[<h2>便利に利用したScalaの機能</h2>まずは便利に利用したScalaの機能もろもろについて。<br /><br /><h3><code>package object</code></h3>プロジェクト内でよく利用する共通処理をプロジェクトのトップパッケージにパッケージオブジェクトで置いておくと便利です。<br /><br /><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/package.scala" target="_blank">package.scala</a><br /><br />サブパッケージのクラスでこれらを参照する場合には、<br /><br /><pre><code>package st.happy_camper.hbase.twitter
@@ -599,7 +599,7 @@ package subpackage</code></pre><br />のようなパッケージ宣言にして�
 
 <entry>
     <title>Coming on Stream その4</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/idea/development/cminst/coming-on-stream-4.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/idea/development/cminst/coming-on-stream-4.html" />
     <id>tag:happy-camper.st,2010://2.47</id>
 
     <published>2010-09-11T07:03:34Z</published>
@@ -608,7 +608,7 @@ package subpackage</code></pre><br />のようなパッケージ宣言にして�
     <summary>Coming on Streamシリーズもおおづめ。その1その2その3作ったもの...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="HBase" scheme="http://www.sixapart.com/ns/types#category" />
@@ -620,11 +620,11 @@ package subpackage</code></pre><br />のようなパッケージ宣言にして�
         <category term="cminst" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
-        <![CDATA[Coming on Streamシリーズもおおづめ。<br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-1.html">その1</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-2.html">その2</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-3.html">その3</a><br /><br />作ったものについて、は今回で終りになります。<br /><br />今回利用するプログラムも、<br /><br /><pre><code>$ git clone https://github.com/ueshin/hbase-twitter.git
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
+        <![CDATA[Coming on Streamシリーズもおおづめ。<br /><a href="https://happy-camper.st/development/cminst/coming-on-stream-1.html">その1</a><br /><a href="https://happy-camper.st/development/cminst/coming-on-stream-2.html">その2</a><br /><a href="https://happy-camper.st/development/cminst/coming-on-stream-3.html">その3</a><br /><br />作ったものについて、は今回で終りになります。<br /><br />今回利用するプログラムも、<br /><br /><pre><code>$ git clone https://github.com/ueshin/hbase-twitter.git
 $ cd hbase-twitter
 $ git checkout hbase-twitter-0.0.2</code></pre><br />を利用します。<br /><br />また <a href="https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.2" target="_blank">https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.2</a>でブラウズできます。<br /><br />]]>
-        <![CDATA[<h2>ホットタグのスコア算出</h2>各言語毎に、最近頻繁にツイートされているホットタグを抽出ためのスコアを算出します。<br /><br />単純にツイート数だけでもよかったんですが、次のような制約を設けることにしました。<br /><br /><ul><li>設定した時間枠だけでなく、過去のツイート数も加味してスコアリングしたい。</li><li>かといって日常的にツイートされているタグ（ <a href="http://twitter.com/#search?q=%23followmejp" target="_blank">#followmejp</a> など ）には高いスコアを付けたくない。</li></ul><br />というわけで、<br /><br /><ol><li>過去２４時間の各時間枠（１時間おき）毎のツイート数に減衰係数を掛けたもの</li><li>上記を合算したものに、頻出度に応じたペナルティを掛ける。</li></ol><br />という感じにスコアリングしました。<br />検索のスコアリングアルゴリズムである <a href="http://ja.wikipedia.org/wiki/Tf-idf">tf-idf</a> を参考にしています。<br /><br />１で過去のツイート数が影響度を減衰しながらも影響を与え、２で日常的にツイートされているタグの抑制をします。<br /><br />計算結果は <code>tagtrend</code> テーブルに格納します。<br /><br /><h3><code>TagScoring</code></h3><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala" target="_blank">TagScoring.scala</a><br /><br />集計対象となる言語を第1引数として必ず指定してください（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L25" target="_blank">25行目</a>）。<br /><br />集計の基準となる時刻は、引数で指定できるようになっています（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L28" target="_blank">28行目</a>）。<br />指定フォーマットは <code>"yyyyMMddHH"</code> で、指定しなかった場合のデフォルトは起動時刻の0分となります。<br /><br />MapReduceジョブでこれらを取得できるように設定しておきます（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L38" target="_blank">38行目</a>）。<br /><br />この時刻から、過去24時間が集計対象となります（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L46" target="_blank">46行目</a>）。<br /><br />集計元が<a href="http://happy-camper.st/development/cminst/coming-on-stream-3.html">前回</a>の転置テーブルになるので、転置処理が終わっているかどうかの確認処理なども入れています（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L58" target="_blank">58行目</a>）。<br /><br /><h3><code>TagScoringMapper</code></h3><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala" target="_blank">TagScoringMapper.scala</a><br /><br />処理の前に、先程送り込んだ計算に必要な設定を取得しておきます（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L27" target="_blank">27行目</a>）。<br /><br /><code>map</code>処理では、各時間枠ごとのツイート数をカウントして（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L35" target="_blank">35行目</a>）、減衰係数をかけながら加算していき（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L41" target="_blank">41行目</a>）、最後にペナルティを掛けます（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L45" target="_blank">45行目</a>）、と。<br /><br /><code>languages</code>テーブルは、基準となる時間に何回ツイートがあったがを保存しつつ、集計が終わったことを表します。<br /><br /><h3>TweetHotTag</h3><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TweetHotTag.scala" target="_blank">TweetHotTag.scala</a><br /><br />集計したスコアの高い順に100個のタグを出力します。<br />言語（必須）と時刻（任意：デフォルトは現在時刻0分）を指定します。<br /><br />クラス名が<code>Tweet〜〜</code>になっているのは（中略）OAuthに移行した<strike>せい</strike>からです。<br /><br /><h2>実行</h2>それでは実行してみます。<br /><br /><pre><code>$ sh target/appassembler/bin/scoring-tag ja
+        <![CDATA[<h2>ホットタグのスコア算出</h2>各言語毎に、最近頻繁にツイートされているホットタグを抽出ためのスコアを算出します。<br /><br />単純にツイート数だけでもよかったんですが、次のような制約を設けることにしました。<br /><br /><ul><li>設定した時間枠だけでなく、過去のツイート数も加味してスコアリングしたい。</li><li>かといって日常的にツイートされているタグ（ <a href="https://twitter.com/#search?q=%23followmejp" target="_blank">#followmejp</a> など ）には高いスコアを付けたくない。</li></ul><br />というわけで、<br /><br /><ol><li>過去２４時間の各時間枠（１時間おき）毎のツイート数に減衰係数を掛けたもの</li><li>上記を合算したものに、頻出度に応じたペナルティを掛ける。</li></ol><br />という感じにスコアリングしました。<br />検索のスコアリングアルゴリズムである <a href="http://ja.wikipedia.org/wiki/Tf-idf">tf-idf</a> を参考にしています。<br /><br />１で過去のツイート数が影響度を減衰しながらも影響を与え、２で日常的にツイートされているタグの抑制をします。<br /><br />計算結果は <code>tagtrend</code> テーブルに格納します。<br /><br /><h3><code>TagScoring</code></h3><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala" target="_blank">TagScoring.scala</a><br /><br />集計対象となる言語を第1引数として必ず指定してください（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L25" target="_blank">25行目</a>）。<br /><br />集計の基準となる時刻は、引数で指定できるようになっています（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L28" target="_blank">28行目</a>）。<br />指定フォーマットは <code>"yyyyMMddHH"</code> で、指定しなかった場合のデフォルトは起動時刻の0分となります。<br /><br />MapReduceジョブでこれらを取得できるように設定しておきます（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L38" target="_blank">38行目</a>）。<br /><br />この時刻から、過去24時間が集計対象となります（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L46" target="_blank">46行目</a>）。<br /><br />集計元が<a href="https://happy-camper.st/development/cminst/coming-on-stream-3.html">前回</a>の転置テーブルになるので、転置処理が終わっているかどうかの確認処理なども入れています（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TagScoring.scala#L58" target="_blank">58行目</a>）。<br /><br /><h3><code>TagScoringMapper</code></h3><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala" target="_blank">TagScoringMapper.scala</a><br /><br />処理の前に、先程送り込んだ計算に必要な設定を取得しておきます（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L27" target="_blank">27行目</a>）。<br /><br /><code>map</code>処理では、各時間枠ごとのツイート数をカウントして（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L35" target="_blank">35行目</a>）、減衰係数をかけながら加算していき（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L41" target="_blank">41行目</a>）、最後にペナルティを掛けます（<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/TagScoringMapper.scala#L45" target="_blank">45行目</a>）、と。<br /><br /><code>languages</code>テーブルは、基準となる時間に何回ツイートがあったがを保存しつつ、集計が終わったことを表します。<br /><br /><h3>TweetHotTag</h3><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/scala/st/happy_camper/hbase/twitter/TweetHotTag.scala" target="_blank">TweetHotTag.scala</a><br /><br />集計したスコアの高い順に100個のタグを出力します。<br />言語（必須）と時刻（任意：デフォルトは現在時刻0分）を指定します。<br /><br />クラス名が<code>Tweet〜〜</code>になっているのは（中略）OAuthに移行した<strike>せい</strike>からです。<br /><br /><h2>実行</h2>それでは実行してみます。<br /><br /><pre><code>$ sh target/appassembler/bin/scoring-tag ja
 $ sh target/appassembler/bin/tweet-hottag ja
 #aclive 6.693075460306 : count = Map(0 -&gt; 8, 1 -&gt; 4, 2 -&gt; 13, 3 -&gt; 9, 4 -&gt; 15, 5 -&gt; 1)
 #gmentalk       5.316292117147331 : count = Map(0 -&gt; 6, 1 -&gt; 4, 3 -&gt; 1)
@@ -640,7 +640,7 @@ $ sh target/appassembler/bin/tweet-hottag ja
 
 <entry>
     <title>Coming on Stream その3</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/idea/development/cminst/coming-on-stream-3.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/idea/development/cminst/coming-on-stream-3.html" />
     <id>tag:happy-camper.st,2010://2.46</id>
 
     <published>2010-09-09T13:27:33Z</published>
@@ -649,7 +649,7 @@ $ sh target/appassembler/bin/tweet-hottag ja
     <summary>Coming on Streamシリーズやってます。その1その2前２回で、NoS...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="HBase" scheme="http://www.sixapart.com/ns/types#category" />
@@ -661,8 +661,8 @@ $ sh target/appassembler/bin/tweet-hottag ja
         <category term="cminst" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
-        <![CDATA[Coming on Streamシリーズやってます。<br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-1.html">その1</a><br /><a href="http://happy-camper.st/development/cminst/coming-on-stream-2.html">その2</a><br /><br />前２回で、<a href="http://happy-camper.st/others/20100724-nosql-hakata.html">NoSQL会@博多</a>編を終わりまして、今回はその後に何をしたのか、をまとめていきます。<br /><br />今回からバージョンをすすめまして、<br /><br /><pre><code>$ git clone https://github.com/ueshin/hbase-twitter.git
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
+        <![CDATA[Coming on Streamシリーズやってます。<br /><a href="https://happy-camper.st/development/cminst/coming-on-stream-1.html">その1</a><br /><a href="https://happy-camper.st/development/cminst/coming-on-stream-2.html">その2</a><br /><br />前２回で、<a href="https://happy-camper.st/others/20100724-nosql-hakata.html">NoSQL会@博多</a>編を終わりまして、今回はその後に何をしたのか、をまとめていきます。<br /><br />今回からバージョンをすすめまして、<br /><br /><pre><code>$ git clone https://github.com/ueshin/hbase-twitter.git
 $ cd hbase-twitter
 $ git checkout hbase-twitter-0.0.2</code></pre><br />を利用します。<br /><br />また <a href="https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.2" target="_blank">https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.2</a>でブラウズできます。<br /><br />]]>
         <![CDATA[<h2>ハッシュタグを行キーにした転置テーブル</h2>まずはハッシュタグを行キーにした転置テーブルを作ってみました。<br /><br />カラムファミリーをユーザー設定の言語毎に分けることでその後の集計を言語別で行えるようにします。<br />あとでそれぞれのハッシュタグにスコアを付けますので、それ用のカラムファミリーも準備しました。<br /><br /><a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.2/src/main/resources/create.rb" target="_blank">create.rb</a><br /><br /><pre><code>create 'tagtrend',
@@ -699,7 +699,7 @@ COLUMN                       CELL
 
 <entry>
     <title>Coming on Stream その2</title>
-    <link rel="alternate" type="text/html" href="http://happy-camper.st/idea/development/cminst/coming-on-stream-2.html" />
+    <link rel="alternate" type="text/html" href="https://happy-camper.st/idea/development/cminst/coming-on-stream-2.html" />
     <id>tag:happy-camper.st,2010://2.45</id>
 
     <published>2010-09-07T13:13:07Z</published>
@@ -708,7 +708,7 @@ COLUMN                       CELL
     <summary>昨日の続き。NoSQL会@博多でお見せしたかったMapReduceによる集計が3...</summary>
     <author>
         <name>Takuya UESHIN</name>
-        <uri>http://happy-camper.st</uri>
+        <uri>https://happy-camper.st</uri>
     </author>
     
         <category term="HBase" scheme="http://www.sixapart.com/ns/types#category" />
@@ -720,8 +720,8 @@ COLUMN                       CELL
         <category term="cminst" scheme="http://www.sixapart.com/ns/types#category" />
     
     
-    <content type="html" xml:lang="ja" xml:base="http://happy-camper.st/">
-        <![CDATA[<a href="http://happy-camper.st/development/cminst/coming-on-stream-1.html">昨日</a>の続き。<br /><br /><a href="http://happy-camper.st/others/20100724-nosql-hakata.html">NoSQL会@博多</a>でお見せしたかったMapReduceによる集計が3つほどありました。<br /><br /><ul><li>言語（<code>user:lang</code>）で集計</li><li>ソース（<code>status#source</code>）で集計</li><li>ハッシュタグ（<code>status#text</code>から抽出）で集計</li></ul><br />昨日からデータが溜まってきていることでしょうから、ぜひ集計を実行してみてください。<br /><br />今回利用するプログラムも、<br /><br /><pre><code>$ git clone https://github.com/ueshin/hbase-twitter.git
+    <content type="html" xml:lang="ja" xml:base="https://happy-camper.st/">
+        <![CDATA[<a href="https://happy-camper.st/development/cminst/coming-on-stream-1.html">昨日</a>の続き。<br /><br /><a href="https://happy-camper.st/others/20100724-nosql-hakata.html">NoSQL会@博多</a>でお見せしたかったMapReduceによる集計が3つほどありました。<br /><br /><ul><li>言語（<code>user:lang</code>）で集計</li><li>ソース（<code>status#source</code>）で集計</li><li>ハッシュタグ（<code>status#text</code>から抽出）で集計</li></ul><br />昨日からデータが溜まってきていることでしょうから、ぜひ集計を実行してみてください。<br /><br />今回利用するプログラムも、<br /><br /><pre><code>$ git clone https://github.com/ueshin/hbase-twitter.git
 $ cd hbase-twitter
 $ git checkout hbase-twitter-0.0.1</code></pre><br />で利用できます。<br /><br />また <a href="https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.1" target="_blank">https://github.com/ueshin/hbase-twitter/tree/hbase-twitter-0.0.1</a>でブラウズできます。<br /><br />]]>
         <![CDATA[<h2>言語（<code>user:lang</code>）で集計</h2>まずはシンプルな方から。<br /><br />格納されているユーザーデータの内、言語（<code>user:lang</code>）で集計します。<br />Twitterでは、6つの言語を設定できますが、充分なデータが収集できていればそれぞれの言語のユーザーがどのように分布しているのかを見ることができます。<br /><br />ソースコードは <a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/LangCounter.scala" target="_blank">LangCounter.scala</a> です。<br /><br /><h3><code>Scan</code>で絞り込み</h3><code>TableMapReduceUtil#initTableMapperJob</code> (<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/LangCounter.scala#L41" target="_blank">41行目</a>) で、MapRecuceの対象となるテーブル（第1引数）と、データ範囲（第2引数の<code>Scan</code>オブジェクト）を指定します。<br /><br />これにより、MapReduceで処理対象でないカラムファミリーをスキャンしなくなり、また、同じカラムファミリーでも必要でないカラムがMapperに渡されなくなります。<br /><br /><h3><code>LangCountMapper</code></h3>Mapperには、行キー -&gt; 行データ の形で指定したカラムデータが渡されますので、これを処理します。<br /><br />今回は、<code>user:lang</code>カラムのデータをキー、<code>1L</code>を値として出力します （<a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/LangCounter.scala#L30" target="_blank">30行目</a>）。<br />この辺のMapper出力〜Reducerの流れは、よく見るワードカウントのサンプルと同じです。<br /><br /><h3>CountReducer</h3>Reducerでは、渡ってきたキーに対する値を集計していきます。<br /><br />ソースコードは <a href="https://github.com/ueshin/hbase-twitter/blob/hbase-twitter-0.0.1/src/main/scala/st/happy_camper/hbase/twitter/mapreduce/CountReducer.scala" target="_blank">CountReducer.scala</a> です。<br />このReducerはあとの2つの集計でも利用します。<br /><br />なお、同様の処理をする <code>org.apache.hadoop.mapreduce.lib.reduce.LongSumReducer</code> がHadoopに標準で入っていますので、普通はこちらを使うとよいと思います。<br /><br /><h3>実行</h3>それでは実行してみます。<br /><br /><pre><code>$ mvn clean package
